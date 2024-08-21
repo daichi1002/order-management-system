@@ -28,13 +28,20 @@ const Header = () => {
         <Link href="/orders" className="text-muted-foreground" prefetch={false}>
           注文
         </Link>
+        <Link
+          href="/daily-closing"
+          className="text-muted-foreground"
+          prefetch={false}
+        >
+          締め作業
+        </Link>
       </nav>
       <div className="ml-auto flex items-center gap-4">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="rounded-full">
               <img
-                src="/placeholder.svg"
+                src="/placeholder-user.jpg"
                 width={36}
                 height={36}
                 alt="アバター"
