@@ -13,7 +13,7 @@ export default function Component() {
           <h1 className="text-2xl font-bold">本日の売上</h1>
           <div className="text-sm text-muted-foreground">2023年8月20日</div>
         </div>
-        <div className="bg-card rounded-lg shadow-md p-6 md:p-8 lg:p-10">
+        <div className="bg-card rounded-lg border border-gray-300 p-6 md:p-8 lg:p-10">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <div>
               <h2 className="text-lg font-medium mb-2">本日の売上合計</h2>
