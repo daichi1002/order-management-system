@@ -24,24 +24,25 @@ make run
 
 ## ディレクトリ構成
 
+<pre>
 .
 ├── cmd
 │   └── server
-│       └── main.go  # エントリーポイント
+│       └── main.go    # エントリーポイント
 ├── internal
-│   ├── adapter  # インターフェースアダプタ層
-│   │   ├── handler  # HTTP ハンドラ
-│   │   └── repository  # データベースリポジトリの実装
-│   ├── di  # Dependency Injection(依存性注入)
-│   ├── domain  # ドメイン層
-│   │   └── model  # エンティティ、バリューオブジェクト
-│   ├── infrastructure  # インフラ層
-│   │   ├── database  # データベース接続
-│   │   └── logger  # ロギング
-│   └── usecase  # ユースケース層
-├── go.mod  # モジュール定義ファイル
-└── go.sum  # モジュールバージョン管理ファイル
-
+│   ├── adapter        # インターフェースアダプタ層
+│   │   ├── handler    # HTTP ハンドラ
+│   │   └── repository # データベースリポジトリの実装
+│   ├── di             # Dependency Injection(依存性注入)
+│   ├── domain         # ドメイン層
+│   │   └── model      # エンティティ、バリューオブジェクト
+│   ├── infrastructure # インフラ層
+│   │   ├── database   # データベース接続
+│   │   └── logger     # ロギング
+│   └── usecase        # ユースケース層
+├── go.mod             # モジュール定義ファイル
+└── go.sum             # モジュールバージョン管理ファイル
+</pre>
 
 ## マイグレーション手順
 
