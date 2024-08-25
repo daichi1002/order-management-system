@@ -16,7 +16,7 @@ make up
 docker exec -it backend-api-1 /bin/sh
 ```
 
-5. 以下のコマンドを実行し、「Hello World!」が表示されることを確認する
+5. 以下のコマンドを実行し、サーバーが起動していることを確認する
 
 ```
 make run
