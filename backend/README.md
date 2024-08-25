@@ -63,33 +63,34 @@ make migrate-down
 <details><summary>テストデータを登録したい場合は、以下のクエリを実行する</summary>
 
 ```
--- テストデータを `menus` テーブルに挿入
-INSERT INTO `menus` (`name`, `price`, `available`, `created_at`, `updated_at`)
+-- `menus` テーブルにテストデータを挿入
+INSERT INTO "menus" ("name", "price", "available", "created_at", "updated_at")
 VALUES
-    ('親子丼', 800.00, TRUE, NOW(), NOW()),
-    ('アジフライ定食', 750.00, TRUE, NOW(), NOW()),
-    ('長崎皿うどん', 850.00, TRUE, NOW(), NOW()),
-    ('ハンバーグ定食', 850.00, TRUE, NOW(), NOW());
+    ('親子丼', 800.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('アジフライ定食', 750.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('長崎皿うどん', 850.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('ハンバーグ定食', 850.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
--- テストデータを `orders` テーブルに挿入
-INSERT INTO `orders` (`numbered_ticket`, `order_date`, `total_amount`, `created_at`, `updated_at`)
+-- `orders` テーブルにテストデータを挿入
+INSERT INTO "orders" ("numbered_ticket", "order_date", "total_amount", "created_at", "updated_at")
 VALUES
-    (1, '2024-08-23 12:34:56', 2450.00, NOW(), NOW()),
-    (2, '2024-08-23 13:45:00', 750.00, NOW(), NOW()),
-    (3, '2024-08-23 14:15:30', 850.00, NOW(), NOW());
+    (1, '2024-08-23 12:34:56', 2450.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    (2, '2024-08-23 13:45:00', 750.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    (3, '2024-08-23 14:15:30', 850.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
--- テストデータを `order_items` テーブルに挿入
-INSERT INTO `order_items` (`order_id`, `menu_id`, `quantity`, `price`, `created_at`, `updated_at`)
+-- `order_items` テーブルにテストデータを挿入
+INSERT INTO "order_items" ("order_id", "menu_id", "quantity", "price", "created_at", "updated_at")
 VALUES
-    (1, 1, 2, 800.00, NOW(), NOW()),
-    (1, 3, 1, 850.00, NOW(), NOW()),
-    (2, 2, 1, 750.00, NOW(), NOW()),
-    (3, 4, 1, 850.00, NOW(), NOW());
+    (1, 1, 2, 800.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    (1, 3, 1, 850.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    (2, 2, 1, 750.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    (3, 4, 1, 850.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
--- テストデータを `daily_closings` テーブルに挿入
-INSERT INTO `daily_closings` (`closing_date`, `total_sales`, `total_orders`, `total_voids`, `notes`, `created_at`, `updated_at`)
+-- `daily_closings` テーブルにテストデータを挿入
+INSERT INTO "daily_closings" ("closing_date", "total_sales", "total_orders", "total_voids", "notes", "created_at", "updated_at")
 VALUES
-    ('2024-08-23', 4050.00, 3, 0, 'No special notes.', NOW(), NOW());
+    ('2024-08-23', 4050.00, 3, 0, 'No special notes.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
 ```
 
 </details>

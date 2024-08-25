@@ -5,7 +5,7 @@ run:
 	go run ./cmd/server/main.go
 
 migrate-up:
-	migrate -path ./migrations -database 'mysql://mysql:password@tcp(localhost:3306)/order-management' -verbose up
+	migrate -path ./migrations -database 'postgres://postgres:password@localhost:5432/order-management?sslmode=disable' -verbose up
 
 migrate-down:
-	migrate -path ./migrations -database 'mysql://mysql:password@tcp(localhost:3306)/order-management' -verbose down 1
+	migrate -path ./migrations -database 'postgres://postgres:password@localhost:5432/order-management?sslmode=disable' -verbose down 1
