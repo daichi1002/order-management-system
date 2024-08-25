@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/daichi1002/order-management-system/backend/internal/di"
@@ -30,6 +31,12 @@ func main() {
 	}
 
 	server.Use(middleware.Logger())
+
+	// CORSミドルウェアを設定
+	server.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"http://localhost:3000"}, // 許可するオリジンを指定
+		AllowMethods: []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete},
+	}))
 
 	if err := server.Start(":8080"); err != nil {
 		log.Fatalf("Failed to start server: %v", err)

@@ -1,109 +1,49 @@
-/**
- * v0 by Vercel.
- * @see https://v0.dev/t/36QbPRwMTcc
- * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
- */
 "use client";
 
-import { useState } from "react";
-
-type OrderItem = {
-  name: string;
-  price: number;
-  quantity: number;
-};
+import { fetchMenu } from "@/api/api";
+import { Menu } from "@/types/menu";
+import { useEffect, useState } from "react";
 
 type Order = {
   id: number;
-  items: OrderItem[];
-  status: string;
+  items: Menu[];
   total: number;
   createdAt: string;
   ticketNumber: string;
 };
 
 export default function Component() {
-  const [orders, setOrders] = useState([
-    {
-      id: 4,
-      items: [
-        { name: "ステーキ", quantity: 1, price: 2000 },
-        { name: "ワイン", quantity: 1, price: 800 },
-      ],
-      status: "completed",
-      total: 2800,
-      createdAt: "2023-05-01 12:37",
-      ticketNumber: "101112",
-    },
-    {
-      id: 3,
-      items: [{ name: "ラーメン", quantity: 1, price: 900 }],
-      status: "delivered",
-      total: 900,
-      createdAt: "2023-05-01 12:36",
-      ticketNumber: "789",
-    },
-    {
-      id: 2,
-      items: [
-        { name: "ピザ", quantity: 1, price: 1500 },
-        { name: "サラダ", quantity: 1, price: 600 },
-      ],
-      status: "cooking",
-      total: 2100,
-      createdAt: "2023-05-01 12:35",
-      ticketNumber: "456",
-    },
-    {
-      id: 1,
-      items: [
-        { name: "ハンバーガー", quantity: 2, price: 800 },
-        { name: "フライドポテト", quantity: 1, price: 400 },
-      ],
-      status: "new",
-      total: 2000,
-      createdAt: "2023-05-01 12:34",
-      ticketNumber: "123",
-    },
-  ]);
-  const [menu, setMenu] = useState([
-    { name: "ハンバーガー", price: 800, quantity: 1 },
-    { name: "フライドポテト", price: 400, quantity: 1 },
-    { name: "ピザ", price: 1500, quantity: 1 },
-    { name: "サラダ", price: 600, quantity: 1 },
-    { name: "ラーメン", price: 900, quantity: 1 },
-    { name: "ステーキ", price: 2000, quantity: 1 },
-    { name: "ワイン", price: 800, quantity: 1 },
-  ]);
+  const [orders, setOrders] = useState<Order[]>([]);
 
+  const [menu, setMenu] = useState<Menu[]>([]);
   const [newOrder, setNewOrder] = useState<Order>({
     id: orders.length + 1,
     items: [],
     total: 0,
     ticketNumber: "",
-    status: "new",
     createdAt: new Date().toLocaleString(),
   });
 
-  const addToOrder = (item: OrderItem) => {
-    const existingItem = newOrder.items.find(
-      (orderItem) => orderItem.name === item.name
-    );
+  useEffect(() => {
+    const loadMenu = async () => {
+      try {
+        const data = await fetchMenu(); // api.tsのfetchMenuを呼び出す
 
-    if (existingItem) {
-      existingItem.quantity += 1;
-      setNewOrder({
-        ...newOrder,
-        items: [...newOrder.items],
-        total: newOrder.total + item.price,
-      });
-    } else {
-      setNewOrder({
-        ...newOrder,
-        items: [...newOrder.items, { ...item, quantity: 1 }],
-        total: newOrder.total + item.price,
-      });
-    }
+        setMenu(data);
+      } catch (error) {
+        console.error("Error fetching menu:", error);
+      }
+    };
+
+    loadMenu();
+  }, []);
+
+  const addToOrder = (item: Menu) => {
+    setNewOrder({
+      ...newOrder,
+      items: [...newOrder.items, { ...item }],
+      total: newOrder.total + item.price,
+    });
   };
 
   const removeFromOrder = (index: number) => {
@@ -112,7 +52,7 @@ export default function Component() {
     setNewOrder({
       ...newOrder,
       items: updatedItems,
-      total: newOrder.total - removedItem.price * removedItem.quantity,
+      total: newOrder.total - removedItem.price,
     });
   };
 
@@ -129,7 +69,6 @@ export default function Component() {
       items: [],
       total: 0,
       ticketNumber: "",
-      status: "new",
       createdAt: new Date().toLocaleString(),
     });
   };
@@ -144,6 +83,7 @@ export default function Component() {
       ticketNumber: e.target.value,
     });
   };
+
   return (
     <div className="container mx-auto px-4 py-8 text-lg">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -231,7 +171,7 @@ export default function Component() {
                     <ul className="space-y-1">
                       {order.items.map((item, index) => (
                         <li key={index}>
-                          {item.name} x {item.quantity}
+                          {item.name} ({item.price}円)
                         </li>
                       ))}
                     </ul>
@@ -239,17 +179,15 @@ export default function Component() {
                   <td className="px-4 py-2 text-center">
                     {order.ticketNumber}
                   </td>
-                  <td className="px-4 py-2 text-center">¥{order.total}</td>
+                  <td className="px-4 py-2 text-center">{order.total}円</td>
                   <td className="px-4 py-2 text-center">{order.createdAt}</td>
                   <td className="px-4 py-2 text-center">
-                    <div className="flex justify-center space-x-2">
-                      <button
-                        className="bg-red-500 text-white px-2 py-1 rounded-md hover:bg-red-600"
-                        onClick={() => cancelOrder(order.id)}
-                      >
-                        キャンセル
-                      </button>
-                    </div>
+                    <button
+                      className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
+                      onClick={() => cancelOrder(order.id)}
+                    >
+                      キャンセル
+                    </button>
                   </td>
                 </tr>
               ))}
