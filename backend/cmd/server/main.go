@@ -34,7 +34,7 @@ func main() {
 
 	// CORSミドルウェアを設定
 	server.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"http://localhost:3000"}, // 許可するオリジンを指定
+		AllowOrigins: []string{os.Getenv("CORS_URL")}, // 許可するオリジンを指定
 		AllowMethods: []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete},
 	}))
 
