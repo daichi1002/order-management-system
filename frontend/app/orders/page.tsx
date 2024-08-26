@@ -14,7 +14,6 @@ type Order = {
 
 export default function Component() {
   const [orders, setOrders] = useState<Order[]>([]);
-
   const [menu, setMenu] = useState<Menu[]>([]);
   const [newOrder, setNewOrder] = useState<Order>({
     id: orders.length + 1,
@@ -23,12 +22,12 @@ export default function Component() {
     ticketNumber: "",
     createdAt: new Date().toLocaleString(),
   });
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const loadMenu = async () => {
       try {
         const data = await fetchMenu(); // api.tsのfetchMenuを呼び出す
-
         setMenu(data);
       } catch (error) {
         console.error("Error fetching menu:", error);
@@ -44,6 +43,7 @@ export default function Component() {
       items: [...newOrder.items, { ...item }],
       total: newOrder.total + item.price,
     });
+    setErrorMessage(null); // アイテム追加時にエラーメッセージをクリア
   };
 
   const removeFromOrder = (index: number) => {
@@ -54,9 +54,20 @@ export default function Component() {
       items: updatedItems,
       total: newOrder.total - removedItem.price,
     });
+    setErrorMessage(""); // アイテム削除時にエラーメッセージをクリア
   };
 
   const placeOrder = () => {
+    if (!newOrder.ticketNumber) {
+      setErrorMessage("番号札を入力してください。");
+      return;
+    }
+
+    if (newOrder.items.length === 0) {
+      setErrorMessage("注文を追加してください。");
+      return;
+    }
+
     setOrders([
       ...orders,
       {
@@ -64,6 +75,7 @@ export default function Component() {
         id: orders.length + 1,
       },
     ]);
+
     setNewOrder({
       id: orders.length + 2,
       items: [],
@@ -71,6 +83,7 @@ export default function Component() {
       ticketNumber: "",
       createdAt: new Date().toLocaleString(),
     });
+    setErrorMessage(null); // 注文成功時にエラーメッセージをクリア
   };
 
   const cancelOrder = (id: number) => {
@@ -82,6 +95,7 @@ export default function Component() {
       ...newOrder,
       ticketNumber: e.target.value,
     });
+    setErrorMessage(null); // 番号札変更時にエラーメッセージをクリア
   };
 
   return (
@@ -106,6 +120,9 @@ export default function Component() {
           <h2 className="text-2xl font-bold mb-4">新しい注文</h2>
           <div className="bg-white rounded-lg shadow-md p-4">
             <div className="space-y-4">
+              {errorMessage && (
+                <p className="text-red-500 font-bold">{errorMessage}</p>
+              )}
               <div>
                 <label htmlFor="ticket-number" className="block font-bold mb-2">
                   番号札
