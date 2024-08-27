@@ -31,9 +31,8 @@ make run
 │       └── main.go    # エントリーポイント
 ├── internal
 │   ├── adapter        # インターフェースアダプタ層
-│   │   ├── handler    # HTTP ハンドラ
+│   │   ├── graph      # graphqlに関連するコード
 │   │   └── repository # データベースリポジトリの実装
-│   ├── di             # Dependency Injection(依存性注入)
 │   ├── domain         # ドメイン層
 │   │   └── model      # エンティティ、バリューオブジェクト
 │   ├── infrastructure # インフラ層
@@ -72,7 +71,7 @@ VALUES
     ('ハンバーグ定食', 850.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- `orders` テーブルにテストデータを挿入
-INSERT INTO "orders" ("numbered_ticket", "order_date", "total_amount", "created_at", "updated_at")
+INSERT INTO "orders" ("ticket_number", "order_date", "total_amount", "created_at", "updated_at")
 VALUES
     (1, '2024-08-23 12:34:56', 2450.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
     (2, '2024-08-23 13:45:00', 750.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),

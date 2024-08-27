@@ -1,7 +1,15 @@
 package usecase
 
-import "github.com/daichi1002/order-management-system/backend/internal/domain/model"
+import (
+	"context"
+
+	"github.com/daichi1002/order-management-system/backend/internal/domain/model"
+)
 
 type MenuUsecase interface {
-	Handle() ([]model.Menu, error)
+	Handle(ctx context.Context) ([]model.Menu, error)
+}
+
+type OrderUsecase interface {
+	Handle(ctx context.Context, order *model.Order, orderItems []*model.OrderItem) (int, error)
 }

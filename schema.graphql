@@ -1,0 +1,48 @@
+scalar DateTime
+
+type Query {
+  menus: [Menu!]!
+}
+
+type Mutation {
+  createOrder(input: OrderInput!): Int!
+}
+
+type Menu {
+  id: Int!
+  name: String!
+  price: Float!
+}
+
+type Order {
+  id: Int!
+  items: [OrderItem!]!
+  totalAmount: Float!
+  ticketNumber: Int!
+  createdAt: DateTime!
+}
+
+type OrderItem {
+  menu: Menu!
+  quantity: Int!
+  price: Float!
+}
+
+input OrderInput {
+  items: [OrderItemInput!]!
+  totalAmount: Float!
+  ticketNumber: Int!
+  createdAt: DateTime!
+}
+
+input OrderItemInput {
+  menu: MenuInput!
+  quantity: Int!
+  price: Float!
+}
+
+input MenuInput {
+  id: Int!
+  name: String!
+  price: Float!
+}

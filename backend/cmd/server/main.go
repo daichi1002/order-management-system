@@ -5,11 +5,17 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/daichi1002/order-management-system/backend/internal/di"
+	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/daichi1002/order-management-system/backend/internal/adapter/graph/generated"
+	"github.com/daichi1002/order-management-system/backend/internal/adapter/graph/resolver"
+
 	"github.com/daichi1002/order-management-system/backend/internal/infrastructure/database"
 	"github.com/daichi1002/order-management-system/backend/internal/infrastructure/logger"
+	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
 	"github.com/joho/godotenv"
-	"github.com/labstack/echo/v4/middleware"
+	"github.com/rs/cors"
 )
 
 func main() {
@@ -25,20 +31,27 @@ func main() {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 
-	server, err := di.InitializeServer(db)
-	if err != nil {
-		log.Fatalf("Failed to initialize server: %v", err)
-	}
+	resolver := resolver.NewResolver(db)
 
-	server.Use(middleware.Logger())
+	router := chi.NewRouter()
+	router.Use(middleware.Logger)
 
-	// CORSミドルウェアを設定
-	server.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{os.Getenv("CORS_URL")}, // 許可するオリジンを指定
-		AllowMethods: []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete},
-	}))
+	// Add CORS middleware around every request
+	// See https://github.com/rs/cors for full option listing
+	router.Use(cors.New(cors.Options{
+		AllowedOrigins:   []string{os.Getenv("CORS_URL")},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: true,
+		MaxAge:           300, // Maximum value not ignored by any of major browsers
+	}).Handler)
 
-	if err := server.Start(":8080"); err != nil {
-		log.Fatalf("Failed to start server: %v", err)
-	}
+	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolver}))
+
+	router.Handle("/", playground.Handler("Starwars", "/query"))
+	router.Handle("/query", srv)
+
+	log.Printf("connect GraphQL playground")
+	log.Fatal(http.ListenAndServe(":8080", router))
 }

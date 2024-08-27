@@ -13,7 +13,7 @@ func NewMenuRepository(db *gorm.DB) MenuRepository {
 	return &menuRepository{db}
 }
 
-func (r *menuRepository) FindAll() ([]model.Menu, error) {
+func (r *menuRepository) GetMenus() ([]model.Menu, error) {
 	var menus []model.Menu
 	if err := r.db.Find(&menus).Error; err != nil {
 		return nil, err
