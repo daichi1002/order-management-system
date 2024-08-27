@@ -8,7 +8,7 @@ interface MenuListProps {
 export const MenuList: React.FC<MenuListProps> = ({ menu, addToOrder }) => (
   <div>
     <h2 className="text-2xl font-bold mb-4">メニュー</h2>
-    <ul className="grid grid-cols-2 gap-4">
+    <ul className="grid grid-cols-4 gap-4">
       {menu.map((item) => (
         <li
           key={item.id}

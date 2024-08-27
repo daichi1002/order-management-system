@@ -19,7 +19,6 @@ export const OrderList: React.FC<OrderListProps> = ({
             <tr className="bg-gray-200">
               <th className="px-4 py-2 text-center">注文ID</th>
               <th className="px-4 py-2 text-center">注文内容</th>
-              <th className="px-4 py-2 text-center">数量</th>
               <th className="px-4 py-2 text-center">番号札</th>
               <th className="px-4 py-2 text-center">合計</th>
               <th className="px-4 py-2 text-center">注文日時</th>
@@ -35,14 +34,9 @@ export const OrderList: React.FC<OrderListProps> = ({
                   <td className="px-4 py-2 text-center">
                     <ul className="space-y-1">
                       {order.items.map((item, index) => (
-                        <li key={index}>{item.menu.name}</li>
-                      ))}
-                    </ul>
-                  </td>
-                  <td className="px-4 py-2 text-center">
-                    <ul className="space-y-1">
-                      {order.items.map((item, index) => (
-                        <li key={index}>{item.quantity}</li>
+                        <li key={index}>
+                          {item.menu.name} x {item.quantity}
+                        </li>
                       ))}
                     </ul>
                   </td>
