@@ -1,6 +1,8 @@
 package usecase
 
 import (
+	"context"
+
 	"github.com/daichi1002/order-management-system/backend/internal/adapter/repository"
 	"github.com/daichi1002/order-management-system/backend/internal/domain/model"
 )
@@ -13,6 +15,6 @@ func NewMenuUsecase(repo repository.MenuRepository) MenuUsecase {
 	return &menuUsecase{repo}
 }
 
-func (u *menuUsecase) Handle() ([]model.Menu, error) {
-	return u.repo.FindAll()
+func (u *menuUsecase) Handle(ctx context.Context) ([]model.Menu, error) {
+	return u.repo.GetMenus()
 }

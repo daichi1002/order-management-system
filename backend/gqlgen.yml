@@ -1,0 +1,17 @@
+schema:
+  - ../*.graphql
+exec:
+  filename: internal/adapter/graph/generated/generated.go
+  package: generated
+model:
+  filename: internal/adapter/graph/generated/models_gen.go
+  package: generated
+resolver:
+  layout: follow-schema
+  dir: internal/adapter/graph/resolver
+  package: resolver
+
+models:
+  DateTime:
+    model:
+      - github.com/daichi1002/order-management-system/backend/internal/adapter/graph/scalar.DateTime

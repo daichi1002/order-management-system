@@ -9,3 +9,6 @@ migrate-up:
 
 migrate-down:
 	migrate -path ./migrations -database 'postgres://postgres:password@localhost:5432/order-management?sslmode=disable' -verbose down 1
+
+generate:
+	go run github.com/99designs/gqlgen generate

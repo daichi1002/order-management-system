@@ -1,7 +1,14 @@
+import { ApolloClient, InMemoryCache } from "@apollo/client";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Header from "../components/layout/Header";
 import "./globals.css";
+import { Providers } from "./provider";
+
+const client = new ApolloClient({
+  uri: "YOUR_GRAPHQL_ENDPOINT",
+  cache: new InMemoryCache(),
+});
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,8 +25,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Header />
-        {children}
+        <Providers>
+          <Header />
+          {children}
+        </Providers>
       </body>
     </html>
   );

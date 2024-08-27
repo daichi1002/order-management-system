@@ -1,0 +1,3 @@
+mutation CreateOrder($input: OrderInput!) {
+  createOrder(input: $input)
+}
