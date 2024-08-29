@@ -27,7 +27,7 @@ func (r *mutationResolver) CreateOrder(ctx context.Context, input generated.Orde
 		}
 		orderItems = append(orderItems, item)
 	}
-	id, err := r.orderUsecase.Handle(ctx, order, orderItems)
+	id, err := r.orderUsecase.CreateOrder(ctx, order, orderItems)
 
 	if err != nil {
 		return 0, err
@@ -36,9 +36,9 @@ func (r *mutationResolver) CreateOrder(ctx context.Context, input generated.Orde
 	return id, nil
 }
 
-// Menus is the resolver for the menus field.
-func (r *queryResolver) Menus(ctx context.Context) ([]*generated.Menu, error) {
-	menus, err := r.menuUsecase.Handle(ctx)
+// GetMenus is the resolver for the getMenus field.
+func (r *queryResolver) GetMenus(ctx context.Context) ([]*generated.Menu, error) {
+	menus, err := r.menuUsecase.GetMenus(ctx)
 
 	if err != nil {
 		return nil, err
@@ -53,6 +53,17 @@ func (r *queryResolver) Menus(ctx context.Context) ([]*generated.Menu, error) {
 		})
 	}
 	return response, nil
+}
+
+// GetOrders is the resolver for the getOrders field.
+func (r *queryResolver) GetOrders(ctx context.Context) ([]*generated.Order, error) {
+	orders, err := r.orderUsecase.GetOrders(ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return orders, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

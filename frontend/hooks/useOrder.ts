@@ -1,12 +1,11 @@
 "use client"
-import { Menu, Order, useCreateOrderMutation } from "@/lib/graphql/graphql";
-import { toJSTDate } from "@/lib/utils";
-import { useState } from "react";
+import { Menu, Order, OrderInput, OrderItem, OrderItemInput, useCreateOrderMutation, useGetOrdersQuery } from "@/lib/graphql/graphql";
+import { useEffect, useState } from "react";
 
 export const useOrder = () => {
   const [createOrder] = useCreateOrderMutation();
   const [orders, setOrders] = useState<Order[]>([]);
-  const [newOrder, setNewOrder] = useState<Omit<Order, "id">>({
+  const [newOrder, setNewOrder] = useState<OrderInput>({
     items: [],
     totalAmount: 0,
     ticketNumber: 0,
@@ -71,7 +70,7 @@ export const useOrder = () => {
         const result = await createOrder({
           variables: {
             input: {
-              createdAt: toJSTDate(new Date()),
+              createdAt: new Date().toISOString(),
               items: newOrder.items,
               ticketNumber: newOrder.ticketNumber,
               totalAmount: newOrder.totalAmount,
@@ -82,8 +81,11 @@ export const useOrder = () => {
           setOrders((prevOrders) => [
             ...prevOrders,
             {
-              ...newOrder,
               id: result.data!.createOrder,
+              createdAt: new Date().toLocaleString(),
+              items: convertOrderItemInputsToOrderItems(newOrder.items),
+              ticketNumber: newOrder.ticketNumber,
+              totalAmount: newOrder.totalAmount,
             },
           ]);
         } else {
@@ -108,6 +110,14 @@ export const useOrder = () => {
     setOrders(orders.filter((order) => order.id !== id));
   };
 
+  const convertOrderItemInputsToOrderItems = (inputs: OrderItemInput[]): OrderItem[] => {
+    return inputs.map(input => ({
+      name: input.menu.name,
+      price: input.price,
+      quantity: input.quantity
+    }));
+  };
+
   const handleTicketNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const ticketNumber = parseInt(e.target.value, 10);
 
@@ -126,6 +136,16 @@ export const useOrder = () => {
     }
   };
 
+// useGetOrdersQueryを呼び出すカスタムフック
+const { data: getOrdersData, loading: getOrderLoading, error: getOrderError } = useGetOrdersQuery();
+  
+useEffect(() => {
+  if (!getOrderLoading && !getOrderError && getOrdersData?.getOrders) {
+    // バックエンドから取得した注文データをフロントエンドの状態に統合
+    setOrders(getOrdersData.getOrders);
+  }
+}, [getOrdersData, getOrderLoading, getOrderError]);
+
   return {
     orders,
     newOrder,
@@ -135,5 +155,7 @@ export const useOrder = () => {
     placeOrder,
     cancelOrder,
     handleTicketNumberChange,
+    getOrderLoading,
+    getOrderError,
   };
 };

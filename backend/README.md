@@ -73,9 +73,9 @@ VALUES
 -- `orders` テーブルにテストデータを挿入
 INSERT INTO "orders" ("ticket_number", "order_date", "total_amount", "created_at", "updated_at")
 VALUES
-    (1, '2024-08-23 12:34:56', 2450.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    (2, '2024-08-23 13:45:00', 750.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    (3, '2024-08-23 14:15:30', 850.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+    (1, CURRENT_TIMESTAMP, 2450.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    (2, CURRENT_TIMESTAMP, 750.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    (3, CURRENT_TIMESTAMP, 850.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- `order_items` テーブルにテストデータを挿入
 INSERT INTO "order_items" ("order_id", "menu_id", "quantity", "price", "created_at", "updated_at")

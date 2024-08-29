@@ -15,6 +15,6 @@ func NewMenuUsecase(repo repository.MenuRepository) MenuUsecase {
 	return &menuUsecase{repo}
 }
 
-func (u *menuUsecase) Handle(ctx context.Context) ([]model.Menu, error) {
+func (u *menuUsecase) GetMenus(ctx context.Context) ([]model.Menu, error) {
 	return u.repo.GetMenus()
 }

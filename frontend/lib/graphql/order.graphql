@@ -1,3 +1,17 @@
 mutation CreateOrder($input: OrderInput!) {
   createOrder(input: $input)
 }
+
+query GetOrders {
+  getOrders {
+    id
+    items {
+      name
+      quantity
+      price
+    }
+    totalAmount
+    ticketNumber
+    createdAt
+  }
+}

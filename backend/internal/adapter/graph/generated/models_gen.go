@@ -37,7 +37,7 @@ type OrderInput struct {
 }
 
 type OrderItem struct {
-	Menu     *Menu   `json:"menu"`
+	Name     string  `json:"name"`
 	Quantity int     `json:"quantity"`
 	Price    float64 `json:"price"`
 }

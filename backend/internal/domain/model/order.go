@@ -3,16 +3,19 @@ package model
 import (
 	"errors"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type Order struct {
-	Id           int       `json:"id"`
-	TicketNumber int       `json:"ticketNumber"`
-	OrderDate    time.Time `json:"orderDate"`
-	TotalAmount  float64   `json:"totalAmount"`
-	CreatedAt    time.Time `json:"createdAt"`
-	UpdatedAt    time.Time `json:"updatedAt"`
-	DeletedAt    time.Time `json:"deletedAt"`
+	Id           int            `gorm:"primaryKey" json:"id"`
+	TicketNumber int            `json:"ticketNumber"`
+	OrderDate    time.Time      `json:"orderDate"`
+	TotalAmount  float64        `json:"totalAmount"`
+	CreatedAt    *time.Time     `json:"createdAt"`
+	UpdatedAt    *time.Time     `json:"updatedAt"`
+	DeletedAt    gorm.DeletedAt `gorm:"index" json:"-"`
+	Items        []OrderItem    `gorm:"foreignKey:OrderId" json:"items"`
 }
 
 func NewOrder(ticketNumber int, orderDate time.Time, totalAmount float64) (*Order, error) {

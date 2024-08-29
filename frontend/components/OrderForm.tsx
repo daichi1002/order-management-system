@@ -1,10 +1,10 @@
 // components/OrderForm.tsx
-import { OrderItem } from '@/lib/graphql/graphql';
-import React from 'react';
+import { OrderItemInput } from "@/lib/graphql/graphql";
+import React from "react";
 
 interface OrderFormProps {
   newOrder: {
-    items: OrderItem[];
+    items: OrderItemInput[];
     totalAmount: number;
     ticketNumber: number;
   };
@@ -36,7 +36,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({
             <input
               id="ticket-number"
               type="text"
-              value={newOrder.ticketNumber || ''}
+              value={newOrder.ticketNumber || ""}
               onChange={handleTicketNumberChange}
               className="w-full border rounded-md px-4 py-2"
               placeholder="番号札を入力してください"
@@ -61,9 +61,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({
             ))}
           </ul>
           <div className="flex justify-between items-center">
-            <p className="text-lg font-bold">
-              合計: ¥{newOrder.totalAmount}
-            </p>
+            <p className="text-lg font-bold">合計: ¥{newOrder.totalAmount}</p>
             <button
               className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
               onClick={placeOrder}

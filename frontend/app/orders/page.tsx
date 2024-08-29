@@ -11,8 +11,8 @@ export default function OrderPage() {
   const { menu, loading, error } = useMenu();
   const orderHook = useOrder();
 
-  if (loading) return <LoadingSpinner />;
-  if (error) return <ErrorMessage />;
+  if (loading || orderHook.getOrderLoading) return <LoadingSpinner />;
+  if (error || orderHook.getOrderError) return <ErrorMessage />;
 
   return (
     <div className="container mx-auto px-4 py-8 text-lg  grid grid-cols-1 md:grid-cols-3 gap-8">

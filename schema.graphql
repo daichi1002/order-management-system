@@ -1,7 +1,8 @@
 scalar DateTime
 
 type Query {
-  menus: [Menu!]!
+  getMenus: [Menu!]!
+  getOrders: [Order!]!
 }
 
 type Mutation {
@@ -23,7 +24,7 @@ type Order {
 }
 
 type OrderItem {
-  menu: Menu!
+  name: String!
   quantity: Int!
   price: Float!
 }

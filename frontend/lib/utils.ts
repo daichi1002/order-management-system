@@ -5,10 +5,14 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function toJSTDate(date: Date) {
-  // UTC日時を日本時間に変換する
-  const jstOffset = 9 * 60; // JSTはUTC+9時間
-  const dateObj = new Date(date);
-  const jstDate = new Date(dateObj.getTime() + jstOffset * 60 * 1000);
-  return jstDate.toISOString(); // ISO 8601形式で出力
-}
+export const formatDateTime = (isoDateString: string): string => {
+  const date = new Date(isoDateString);
+  return date.toLocaleString('ja-JP', {
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  });
+};

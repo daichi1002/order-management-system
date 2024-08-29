@@ -1,5 +1,5 @@
 query GetMenus {
-  menus {
+  getMenus {
     id
     name
     price

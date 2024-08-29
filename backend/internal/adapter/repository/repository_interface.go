@@ -13,6 +13,7 @@ type MenuRepository interface {
 
 type OrderRepository interface {
 	CreateOrder(ctx context.Context, tx *gorm.DB, order *model.Order) (int, error)
+	GetTodayOrdersWithDetails(ctx context.Context) ([]*model.Order, error)
 }
 
 type OrderItemRepository interface {

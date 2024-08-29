@@ -65,13 +65,14 @@ type ComplexityRoot struct {
 	}
 
 	OrderItem struct {
-		Menu     func(childComplexity int) int
+		Name     func(childComplexity int) int
 		Price    func(childComplexity int) int
 		Quantity func(childComplexity int) int
 	}
 
 	Query struct {
-		Menus func(childComplexity int) int
+		GetMenus  func(childComplexity int) int
+		GetOrders func(childComplexity int) int
 	}
 }
 
@@ -79,7 +80,8 @@ type MutationResolver interface {
 	CreateOrder(ctx context.Context, input OrderInput) (int, error)
 }
 type QueryResolver interface {
-	Menus(ctx context.Context) ([]*Menu, error)
+	GetMenus(ctx context.Context) ([]*Menu, error)
+	GetOrders(ctx context.Context) ([]*Order, error)
 }
 
 type executableSchema struct {
@@ -169,12 +171,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Order.TotalAmount(childComplexity), true
 
-	case "OrderItem.menu":
-		if e.complexity.OrderItem.Menu == nil {
+	case "OrderItem.name":
+		if e.complexity.OrderItem.Name == nil {
 			break
 		}
 
-		return e.complexity.OrderItem.Menu(childComplexity), true
+		return e.complexity.OrderItem.Name(childComplexity), true
 
 	case "OrderItem.price":
 		if e.complexity.OrderItem.Price == nil {
@@ -190,12 +192,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.OrderItem.Quantity(childComplexity), true
 
-	case "Query.menus":
-		if e.complexity.Query.Menus == nil {
+	case "Query.getMenus":
+		if e.complexity.Query.GetMenus == nil {
 			break
 		}
 
-		return e.complexity.Query.Menus(childComplexity), true
+		return e.complexity.Query.GetMenus(childComplexity), true
+
+	case "Query.getOrders":
+		if e.complexity.Query.GetOrders == nil {
+			break
+		}
+
+		return e.complexity.Query.GetOrders(childComplexity), true
 
 	}
 	return 0, false
@@ -308,7 +317,8 @@ var sources = []*ast.Source{
 	{Name: "../../../../../schema.graphql", Input: `scalar DateTime
 
 type Query {
-  menus: [Menu!]!
+  getMenus: [Menu!]!
+  getOrders: [Order!]!
 }
 
 type Mutation {
@@ -330,7 +340,7 @@ type Order {
 }
 
 type OrderItem {
-  menu: Menu!
+  name: String!
   quantity: Int!
   price: Float!
 }
@@ -699,8 +709,8 @@ func (ec *executionContext) fieldContext_Order_items(_ context.Context, field gr
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "menu":
-				return ec.fieldContext_OrderItem_menu(ctx, field)
+			case "name":
+				return ec.fieldContext_OrderItem_name(ctx, field)
 			case "quantity":
 				return ec.fieldContext_OrderItem_quantity(ctx, field)
 			case "price":
@@ -844,8 +854,8 @@ func (ec *executionContext) fieldContext_Order_createdAt(_ context.Context, fiel
 	return fc, nil
 }
 
-func (ec *executionContext) _OrderItem_menu(ctx context.Context, field graphql.CollectedField, obj *OrderItem) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_OrderItem_menu(ctx, field)
+func (ec *executionContext) _OrderItem_name(ctx context.Context, field graphql.CollectedField, obj *OrderItem) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_OrderItem_name(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -858,7 +868,7 @@ func (ec *executionContext) _OrderItem_menu(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Menu, nil
+		return obj.Name, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -870,27 +880,19 @@ func (ec *executionContext) _OrderItem_menu(ctx context.Context, field graphql.C
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*Menu)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNMenu2ᚖgithubᚗcomᚋdaichi1002ᚋorderᚑmanagementᚑsystemᚋbackendᚋinternalᚋadapterᚋgraphᚋgeneratedᚐMenu(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_OrderItem_menu(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_OrderItem_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "OrderItem",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Menu_id(ctx, field)
-			case "name":
-				return ec.fieldContext_Menu_name(ctx, field)
-			case "price":
-				return ec.fieldContext_Menu_price(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Menu", field.Name)
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -984,8 +986,8 @@ func (ec *executionContext) fieldContext_OrderItem_price(_ context.Context, fiel
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_menus(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_menus(ctx, field)
+func (ec *executionContext) _Query_getMenus(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_getMenus(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -998,7 +1000,7 @@ func (ec *executionContext) _Query_menus(ctx context.Context, field graphql.Coll
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Menus(rctx)
+		return ec.resolvers.Query().GetMenus(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1015,7 +1017,7 @@ func (ec *executionContext) _Query_menus(ctx context.Context, field graphql.Coll
 	return ec.marshalNMenu2ᚕᚖgithubᚗcomᚋdaichi1002ᚋorderᚑmanagementᚑsystemᚋbackendᚋinternalᚋadapterᚋgraphᚋgeneratedᚐMenuᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Query_menus(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_getMenus(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -1031,6 +1033,62 @@ func (ec *executionContext) fieldContext_Query_menus(_ context.Context, field gr
 				return ec.fieldContext_Menu_price(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Menu", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_getOrders(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_getOrders(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetOrders(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*Order)
+	fc.Result = res
+	return ec.marshalNOrder2ᚕᚖgithubᚗcomᚋdaichi1002ᚋorderᚑmanagementᚑsystemᚋbackendᚋinternalᚋadapterᚋgraphᚋgeneratedᚐOrderᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_getOrders(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Order_id(ctx, field)
+			case "items":
+				return ec.fieldContext_Order_items(ctx, field)
+			case "totalAmount":
+				return ec.fieldContext_Order_totalAmount(ctx, field)
+			case "ticketNumber":
+				return ec.fieldContext_Order_ticketNumber(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Order_createdAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Order", field.Name)
 		},
 	}
 	return fc, nil
@@ -3244,8 +3302,8 @@ func (ec *executionContext) _OrderItem(ctx context.Context, sel ast.SelectionSet
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("OrderItem")
-		case "menu":
-			out.Values[i] = ec._OrderItem_menu(ctx, field, obj)
+		case "name":
+			out.Values[i] = ec._OrderItem_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -3301,7 +3359,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
-		case "menus":
+		case "getMenus":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -3310,7 +3368,29 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_menus(ctx, field)
+				res = ec._Query_getMenus(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "getOrders":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getOrders(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -3797,6 +3877,60 @@ func (ec *executionContext) marshalNMenu2ᚖgithubᚗcomᚋdaichi1002ᚋorderᚑ
 func (ec *executionContext) unmarshalNMenuInput2ᚖgithubᚗcomᚋdaichi1002ᚋorderᚑmanagementᚑsystemᚋbackendᚋinternalᚋadapterᚋgraphᚋgeneratedᚐMenuInput(ctx context.Context, v interface{}) (*MenuInput, error) {
 	res, err := ec.unmarshalInputMenuInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNOrder2ᚕᚖgithubᚗcomᚋdaichi1002ᚋorderᚑmanagementᚑsystemᚋbackendᚋinternalᚋadapterᚋgraphᚋgeneratedᚐOrderᚄ(ctx context.Context, sel ast.SelectionSet, v []*Order) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNOrder2ᚖgithubᚗcomᚋdaichi1002ᚋorderᚑmanagementᚑsystemᚋbackendᚋinternalᚋadapterᚋgraphᚋgeneratedᚐOrder(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNOrder2ᚖgithubᚗcomᚋdaichi1002ᚋorderᚑmanagementᚑsystemᚋbackendᚋinternalᚋadapterᚋgraphᚋgeneratedᚐOrder(ctx context.Context, sel ast.SelectionSet, v *Order) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Order(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNOrderInput2githubᚗcomᚋdaichi1002ᚋorderᚑmanagementᚑsystemᚋbackendᚋinternalᚋadapterᚋgraphᚋgeneratedᚐOrderInput(ctx context.Context, v interface{}) (OrderInput, error) {

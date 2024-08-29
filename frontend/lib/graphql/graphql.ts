@@ -59,7 +59,7 @@ export type OrderInput = {
 
 export type OrderItem = {
   __typename?: 'OrderItem';
-  menu: Menu;
+  name: Scalars['String']['output'];
   price: Scalars['Float']['output'];
   quantity: Scalars['Int']['output'];
 };
@@ -72,13 +72,14 @@ export type OrderItemInput = {
 
 export type Query = {
   __typename?: 'Query';
-  menus: Array<Menu>;
+  getMenus: Array<Menu>;
+  getOrders: Array<Order>;
 };
 
 export type GetMenusQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetMenusQuery = { __typename?: 'Query', menus: Array<{ __typename?: 'Menu', id: number, name: string, price: number }> };
+export type GetMenusQuery = { __typename?: 'Query', getMenus: Array<{ __typename?: 'Menu', id: number, name: string, price: number }> };
 
 export type CreateOrderMutationVariables = Exact<{
   input: OrderInput;
@@ -87,10 +88,15 @@ export type CreateOrderMutationVariables = Exact<{
 
 export type CreateOrderMutation = { __typename?: 'Mutation', createOrder: number };
 
+export type GetOrdersQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetOrdersQuery = { __typename?: 'Query', getOrders: Array<{ __typename?: 'Order', id: number, totalAmount: number, ticketNumber: number, createdAt: any, items: Array<{ __typename?: 'OrderItem', name: string, quantity: number, price: number }> }> };
+
 
 export const GetMenusDocument = gql`
     query GetMenus {
-  menus {
+  getMenus {
     id
     name
     price
@@ -160,3 +166,50 @@ export function useCreateOrderMutation(baseOptions?: Apollo.MutationHookOptions<
 export type CreateOrderMutationHookResult = ReturnType<typeof useCreateOrderMutation>;
 export type CreateOrderMutationResult = Apollo.MutationResult<CreateOrderMutation>;
 export type CreateOrderMutationOptions = Apollo.BaseMutationOptions<CreateOrderMutation, CreateOrderMutationVariables>;
+export const GetOrdersDocument = gql`
+    query GetOrders {
+  getOrders {
+    id
+    items {
+      name
+      quantity
+      price
+    }
+    totalAmount
+    ticketNumber
+    createdAt
+  }
+}
+    `;
+
+/**
+ * __useGetOrdersQuery__
+ *
+ * To run a query within a React component, call `useGetOrdersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetOrdersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetOrdersQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetOrdersQuery(baseOptions?: Apollo.QueryHookOptions<GetOrdersQuery, GetOrdersQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetOrdersQuery, GetOrdersQueryVariables>(GetOrdersDocument, options);
+      }
+export function useGetOrdersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetOrdersQuery, GetOrdersQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetOrdersQuery, GetOrdersQueryVariables>(GetOrdersDocument, options);
+        }
+export function useGetOrdersSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetOrdersQuery, GetOrdersQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetOrdersQuery, GetOrdersQueryVariables>(GetOrdersDocument, options);
+        }
+export type GetOrdersQueryHookResult = ReturnType<typeof useGetOrdersQuery>;
+export type GetOrdersLazyQueryHookResult = ReturnType<typeof useGetOrdersLazyQuery>;
+export type GetOrdersSuspenseQueryHookResult = ReturnType<typeof useGetOrdersSuspenseQuery>;
+export type GetOrdersQueryResult = Apollo.QueryResult<GetOrdersQuery, GetOrdersQueryVariables>;

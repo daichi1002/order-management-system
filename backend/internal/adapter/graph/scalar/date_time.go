@@ -28,8 +28,19 @@ func UnmarshalDateTime(v interface{}) (DateTime, error) {
 		if err != nil {
 			return DateTime{}, err
 		}
-		return DateTime(t), nil
+
+		loc, err := time.LoadLocation("Asia/Tokyo")
+		if err != nil {
+			return DateTime{}, fmt.Errorf("failed to load location: %v", err)
+		}
+		jstTime := time.Time(t).In(loc)
+
+		return DateTime(jstTime), nil
 	default:
 		return DateTime{}, fmt.Errorf("invalid datetime format")
 	}
+}
+
+func TimeToDateTime(t time.Time) DateTime {
+	return DateTime(t)
 }
