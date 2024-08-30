@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 import Header from "../components/layout/Header";
 import "./globals.css";
 import { Providers } from "./provider";
+import { Toaster } from "@/components/ui/toaster";
 
 const client = new ApolloClient({
   uri: "YOUR_GRAPHQL_ENDPOINT",
@@ -28,6 +29,7 @@ export default function RootLayout({
         <Providers>
           <Header />
           {children}
+          <Toaster />
         </Providers>
       </body>
     </html>

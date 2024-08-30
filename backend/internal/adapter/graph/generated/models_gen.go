@@ -7,13 +7,13 @@ import (
 )
 
 type Menu struct {
-	ID    int     `json:"id"`
+	ID    string  `json:"id"`
 	Name  string  `json:"name"`
 	Price float64 `json:"price"`
 }
 
 type MenuInput struct {
-	ID    int     `json:"id"`
+	ID    string  `json:"id"`
 	Name  string  `json:"name"`
 	Price float64 `json:"price"`
 }
@@ -22,7 +22,7 @@ type Mutation struct {
 }
 
 type Order struct {
-	ID           int             `json:"id"`
+	ID           string          `json:"id"`
 	Items        []*OrderItem    `json:"items"`
 	TotalAmount  float64         `json:"totalAmount"`
 	TicketNumber int             `json:"ticketNumber"`

@@ -23,3 +23,13 @@ func (r *orderItemRepository) CreateOrderItems(ctx context.Context, tx *gorm.DB,
 
 	return nil
 }
+
+func (r *orderItemRepository) DeleteOrderItems(ctx context.Context, tx *gorm.DB, id int) error {
+	result := tx.WithContext(ctx).Where("order_id = ?", id).Delete(&model.OrderItem{})
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}

@@ -1,4 +1,3 @@
-// components/OrderForm.tsx
 import { OrderItemInput } from "@/lib/graphql/graphql";
 import React from "react";
 
@@ -11,7 +10,7 @@ interface OrderFormProps {
   errorMessage: string | null;
   removeFromOrder: (index: number) => void;
   handleTicketNumberChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  placeOrder: () => void;
+  placeOrder: () => Promise<void>;
 }
 
 export const OrderForm: React.FC<OrderFormProps> = ({
@@ -21,6 +20,12 @@ export const OrderForm: React.FC<OrderFormProps> = ({
   handleTicketNumberChange,
   placeOrder,
 }) => {
+  const handlePlaceOrder = async () => {
+    try {
+      await placeOrder();
+    } catch (error) {}
+  };
+
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">新しい注文</h2>
@@ -64,7 +69,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({
             <p className="text-lg font-bold">合計: ¥{newOrder.totalAmount}</p>
             <button
               className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
-              onClick={placeOrder}
+              onClick={handlePlaceOrder}
             >
               注文する
             </button>

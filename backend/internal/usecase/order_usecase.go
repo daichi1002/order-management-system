@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/daichi1002/order-management-system/backend/internal/adapter/graph/generated"
 	"github.com/daichi1002/order-management-system/backend/internal/adapter/graph/scalar"
@@ -53,11 +54,12 @@ func (u *orderUsecase) GetOrders(ctx context.Context) ([]*generated.Order, error
 
 	return u.convertToResponseOrders(orders), nil
 }
+
 func (u *orderUsecase) convertToResponseOrders(dbOrders []*model.Order) []*generated.Order {
 	var orders []*generated.Order
 	for _, dbOrder := range dbOrders {
 		orders = append(orders, &generated.Order{
-			ID:           dbOrder.Id,
+			ID:           strconv.Itoa(dbOrder.Id),
 			TicketNumber: dbOrder.TicketNumber,
 			TotalAmount:  dbOrder.TotalAmount,
 			CreatedAt:    scalar.TimeToDateTime(dbOrder.OrderDate),
@@ -78,4 +80,25 @@ func (u *orderUsecase) convertToResponseOrderItems(dbItems []model.OrderItem) []
 		}
 	}
 	return items
+}
+
+func (u *orderUsecase) CancelOrder(ctx context.Context, id int) error {
+
+	tx := u.txManager.Begin()
+
+	defer u.txManager.Rollback(tx)
+
+	err := u.orderItemRepository.DeleteOrderItems(ctx, tx, id)
+
+	if err != nil {
+		return err
+	}
+
+	err = u.orderRepository.DeleteOrder(ctx, tx, id)
+	if err != nil {
+		return err
+	}
+
+	u.txManager.Commit(tx)
+	return nil
 }

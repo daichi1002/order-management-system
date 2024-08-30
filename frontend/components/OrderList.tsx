@@ -2,10 +2,17 @@ import { Order } from "@/lib/graphql/graphql";
 import { formatDateTime } from "@/lib/utils";
 import React, { useState } from "react";
 import { Pagination } from "./layout/Pagenation";
+import { OrderCancelDialog } from "./OrderCancelDialog";
+
+// 今日の日付を取得するユーティリティ関数
+const getTodayDate = () => {
+  const today = new Date();
+  return `${today.getFullYear()}/${today.getMonth() + 1}/${today.getDate()}`;
+};
 
 interface OrderListProps {
   orders: Order[];
-  cancelOrder: (id: number) => void;
+  cancelOrder: (id: string) => void;
 }
 
 export const OrderList: React.FC<OrderListProps> = ({
@@ -14,7 +21,9 @@ export const OrderList: React.FC<OrderListProps> = ({
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const ordersPerPage = 7;
-  const sortedOrders = [...orders].sort((a, b) => b.id - a.id);
+  const sortedOrders = [...orders].sort(
+    (a, b) => parseInt(b.id, 10) - parseInt(a.id, 10)
+  );
 
   const indexOfLastOrder = currentPage * ordersPerPage;
   const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
@@ -28,7 +37,9 @@ export const OrderList: React.FC<OrderListProps> = ({
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mt-8 mb-4">注文一覧</h2>
+      <h2 className="text-2xl font-bold mt-8 mb-2">
+        注文一覧 ({getTodayDate()})
+      </h2>
       <div className="bg-white rounded-lg shadow-md overflow-x-auto mb-0">
         <table className="w-full table-auto text-left">
           <thead>
@@ -37,7 +48,7 @@ export const OrderList: React.FC<OrderListProps> = ({
               <th className="px-4 py-2 text-center">注文内容</th>
               <th className="px-4 py-2 text-center">番号札</th>
               <th className="px-4 py-2 text-center">合計</th>
-              <th className="px-4 py-2 text-center">注文日時</th>
+              <th className="px-4 py-2 text-center">注文時間</th>{" "}
               <th className="px-4 py-2 text-center">操作</th>
             </tr>
           </thead>
@@ -57,15 +68,19 @@ export const OrderList: React.FC<OrderListProps> = ({
                 <td className="px-4 py-2 text-center">{order.ticketNumber}</td>
                 <td className="px-4 py-2 text-center">¥{order.totalAmount}</td>
                 <td className="px-4 py-2 text-center">
-                  {formatDateTime(order.createdAt)}
+                  {formatDateTime(order.createdAt, "HH:mm:ss")}
                 </td>
                 <td className="px-4 py-2 text-center">
-                  <button
-                    className="bg-red-500 text-white px-2 py-1 rounded-md hover:bg-red-600"
-                    onClick={() => cancelOrder(order.id)}
-                  >
-                    キャンセル
-                  </button>
+                  <OrderCancelDialog
+                    order={{
+                      id: order.id,
+                      ticketNumber: order.ticketNumber,
+                      totalAmount: order.totalAmount,
+                      items: order.items,
+                      createdAt: order.createdAt,
+                    }}
+                    onConfirm={cancelOrder}
+                  />
                 </td>
               </tr>
             ))}

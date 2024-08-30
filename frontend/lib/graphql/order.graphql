@@ -2,6 +2,10 @@ mutation CreateOrder($input: OrderInput!) {
   createOrder(input: $input)
 }
 
+mutation CancelOrder($id: ID!) {
+  cancelOrder(id: $id)
+}
+
 query GetOrders {
   getOrders {
     id

@@ -6,6 +6,7 @@ package resolver
 
 import (
 	"context"
+	"strconv"
 	"time"
 
 	"github.com/daichi1002/order-management-system/backend/internal/adapter/graph/generated"
@@ -13,27 +14,44 @@ import (
 )
 
 // CreateOrder is the resolver for the createOrder field.
-func (r *mutationResolver) CreateOrder(ctx context.Context, input generated.OrderInput) (int, error) {
+func (r *mutationResolver) CreateOrder(ctx context.Context, input generated.OrderInput) (string, error) {
 	order, err := model.NewOrder(input.TicketNumber, time.Time(input.CreatedAt), input.TotalAmount)
 	if err != nil {
-		return 0, err
+		return "", err
 	}
 
 	var orderItems []*model.OrderItem
 	for _, o := range input.Items {
 		item, err := model.NewOrderItem(o.Menu.ID, o.Quantity, o.Price)
 		if err != nil {
-			return 0, err
+			return "", err
 		}
 		orderItems = append(orderItems, item)
 	}
 	id, err := r.orderUsecase.CreateOrder(ctx, order, orderItems)
 
 	if err != nil {
-		return 0, err
+		return "", err
 	}
 
-	return id, nil
+	return strconv.Itoa(id), nil
+}
+
+// CancelOrder is the resolver for the cancelOrder field.
+func (r *mutationResolver) CancelOrder(ctx context.Context, id string) (bool, error) {
+	orderId, err := strconv.Atoi(id)
+
+	if err != nil {
+		return false, err
+	}
+
+	err = r.orderUsecase.CancelOrder(ctx, orderId)
+
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }
 
 // GetMenus is the resolver for the getMenus field.
@@ -47,7 +65,7 @@ func (r *queryResolver) GetMenus(ctx context.Context) ([]*generated.Menu, error)
 	var response []*generated.Menu
 	for _, menu := range menus {
 		response = append(response, &generated.Menu{
-			ID:    menu.Id,
+			ID:    strconv.Itoa(menu.Id),
 			Name:  menu.Name,
 			Price: menu.Price,
 		})

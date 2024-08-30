@@ -6,17 +6,18 @@ type Query {
 }
 
 type Mutation {
-  createOrder(input: OrderInput!): Int!
+  createOrder(input: OrderInput!): ID!
+  cancelOrder(id: ID!): Boolean!
 }
 
 type Menu {
-  id: Int!
+  id: ID!
   name: String!
   price: Float!
 }
 
 type Order {
-  id: Int!
+  id: ID!
   items: [OrderItem!]!
   totalAmount: Float!
   ticketNumber: Int!
@@ -43,7 +44,7 @@ input OrderItemInput {
 }
 
 input MenuInput {
-  id: Int!
+  id: ID!
   name: String!
   price: Float!
 }

@@ -20,20 +20,26 @@ export type Scalars = {
 
 export type Menu = {
   __typename?: 'Menu';
-  id: Scalars['Int']['output'];
+  id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
   price: Scalars['Float']['output'];
 };
 
 export type MenuInput = {
-  id: Scalars['Int']['input'];
+  id: Scalars['ID']['input'];
   name: Scalars['String']['input'];
   price: Scalars['Float']['input'];
 };
 
 export type Mutation = {
   __typename?: 'Mutation';
-  createOrder: Scalars['Int']['output'];
+  cancelOrder: Scalars['Boolean']['output'];
+  createOrder: Scalars['ID']['output'];
+};
+
+
+export type MutationCancelOrderArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -44,7 +50,7 @@ export type MutationCreateOrderArgs = {
 export type Order = {
   __typename?: 'Order';
   createdAt: Scalars['DateTime']['output'];
-  id: Scalars['Int']['output'];
+  id: Scalars['ID']['output'];
   items: Array<OrderItem>;
   ticketNumber: Scalars['Int']['output'];
   totalAmount: Scalars['Float']['output'];
@@ -79,19 +85,26 @@ export type Query = {
 export type GetMenusQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetMenusQuery = { __typename?: 'Query', getMenus: Array<{ __typename?: 'Menu', id: number, name: string, price: number }> };
+export type GetMenusQuery = { __typename?: 'Query', getMenus: Array<{ __typename?: 'Menu', id: string, name: string, price: number }> };
 
 export type CreateOrderMutationVariables = Exact<{
   input: OrderInput;
 }>;
 
 
-export type CreateOrderMutation = { __typename?: 'Mutation', createOrder: number };
+export type CreateOrderMutation = { __typename?: 'Mutation', createOrder: string };
+
+export type CancelOrderMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type CancelOrderMutation = { __typename?: 'Mutation', cancelOrder: boolean };
 
 export type GetOrdersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetOrdersQuery = { __typename?: 'Query', getOrders: Array<{ __typename?: 'Order', id: number, totalAmount: number, ticketNumber: number, createdAt: any, items: Array<{ __typename?: 'OrderItem', name: string, quantity: number, price: number }> }> };
+export type GetOrdersQuery = { __typename?: 'Query', getOrders: Array<{ __typename?: 'Order', id: string, totalAmount: number, ticketNumber: number, createdAt: any, items: Array<{ __typename?: 'OrderItem', name: string, quantity: number, price: number }> }> };
 
 
 export const GetMenusDocument = gql`
@@ -166,6 +179,37 @@ export function useCreateOrderMutation(baseOptions?: Apollo.MutationHookOptions<
 export type CreateOrderMutationHookResult = ReturnType<typeof useCreateOrderMutation>;
 export type CreateOrderMutationResult = Apollo.MutationResult<CreateOrderMutation>;
 export type CreateOrderMutationOptions = Apollo.BaseMutationOptions<CreateOrderMutation, CreateOrderMutationVariables>;
+export const CancelOrderDocument = gql`
+    mutation CancelOrder($id: ID!) {
+  cancelOrder(id: $id)
+}
+    `;
+export type CancelOrderMutationFn = Apollo.MutationFunction<CancelOrderMutation, CancelOrderMutationVariables>;
+
+/**
+ * __useCancelOrderMutation__
+ *
+ * To run a mutation, you first call `useCancelOrderMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCancelOrderMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [cancelOrderMutation, { data, loading, error }] = useCancelOrderMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useCancelOrderMutation(baseOptions?: Apollo.MutationHookOptions<CancelOrderMutation, CancelOrderMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CancelOrderMutation, CancelOrderMutationVariables>(CancelOrderDocument, options);
+      }
+export type CancelOrderMutationHookResult = ReturnType<typeof useCancelOrderMutation>;
+export type CancelOrderMutationResult = Apollo.MutationResult<CancelOrderMutation>;
+export type CancelOrderMutationOptions = Apollo.BaseMutationOptions<CancelOrderMutation, CancelOrderMutationVariables>;
 export const GetOrdersDocument = gql`
     query GetOrders {
   getOrders {
