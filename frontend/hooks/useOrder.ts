@@ -54,12 +54,10 @@ export const useOrder = () => {
 
   const placeOrder = async () => {
     if (!newOrder.ticketNumber) {
-      setErrorMessage("番号札を入力してください。");
-      throw new Error("注文の送信に失敗しました。");
+      throw new Error("番号札を入力してください。");
     }
     if (newOrder.items.length === 0) {
-      setErrorMessage("注文を追加してください。");
-      throw new Error("注文の送信に失敗しました。");
+      throw new Error("注文を追加してください。");
     }
 
     try {
