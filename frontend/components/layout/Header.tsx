@@ -29,6 +29,13 @@ const Header = () => {
           注文
         </Link>
         <Link
+          href="/order-list"
+          className="text-muted-foreground"
+          prefetch={false}
+        >
+          注文履歴
+        </Link>
+        <Link
           href="/daily-closing"
           className="text-muted-foreground"
           prefetch={false}
