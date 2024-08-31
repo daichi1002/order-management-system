@@ -1,0 +1,7 @@
+mutation CreateDailyClosing($input: DailyClosingInput!) {
+  createDailyClosing(input: $input)
+}
+
+query IsSalesConfirmed($date: DateTime!) {
+  isSalesConfirmed(date: $date)
+}

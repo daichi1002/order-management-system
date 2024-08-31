@@ -5,35 +5,11 @@ import { MenuList } from "@/components/MenuList";
 import { OrderForm } from "@/components/OrderForm";
 import { OrderList } from "@/components/OrderList";
 import { useToast } from "@/components/ui/use-toast";
+import { useDailyClosing } from "@/hooks/useDailyClosing";
 import { useMenu } from "@/hooks/useMenu";
 import { useOrder } from "@/hooks/useOrder";
-
-const successToastStyle = { background: "rgb(34 197 94)", color: "#fff" };
-
-const showToast = (toast: any, message: string, isSuccess: boolean) => {
-  toast({
-    description: message,
-    duration: isSuccess ? 3000 : 5000,
-    ...(isSuccess ? { style: successToastStyle } : { variant: "destructive" }),
-  });
-};
-
-const withErrorHandling =
-  <T extends (...args: any[]) => Promise<void>>(
-    action: T,
-    successMessage: string,
-    errorMessage: string,
-    toast: any
-  ) =>
-  async (...args: Parameters<T>) => {
-    try {
-      await action(...args);
-      showToast(toast, successMessage, true);
-    } catch (error) {
-      console.error(`Error: ${errorMessage}`, error);
-      showToast(toast, errorMessage, false);
-    }
-  };
+import { withErrorHandling } from "@/lib/toast-utils";
+import { useMemo } from "react";
 
 export default function OrderPage() {
   const { menu, loading: menuLoading, error: menuError } = useMenu();
@@ -51,8 +27,16 @@ export default function OrderPage() {
   } = useOrder();
   const { toast } = useToast();
 
-  if (menuLoading || getOrderLoading) return <LoadingSpinner />;
+  const today = useMemo(() => new Date().toISOString(), []);
+  const { useIsSalesConfirmed } = useDailyClosing();
+  const { data: salesConfirmedData, loading: salesConfirmedLoading } =
+    useIsSalesConfirmed(today);
+
+  if (menuLoading || getOrderLoading || salesConfirmedLoading)
+    return <LoadingSpinner />;
   if (menuError || getOrderError) return <ErrorMessage />;
+
+  const isClosingConfirmed = salesConfirmedData?.isSalesConfirmed;
 
   const handleCancelOrder = withErrorHandling(
     (id: string) => cancelOrder(id),
@@ -71,8 +55,14 @@ export default function OrderPage() {
   return (
     <div className="container mx-auto px-4 py-8 text-lg grid grid-cols-1 md:grid-cols-3 gap-8">
       <div className="order-2 md:order-1 md:col-span-2">
-        <MenuList menu={menu} addToOrder={addToOrder} />
-        <OrderList orders={orders} cancelOrder={handleCancelOrder} />
+        <MenuList
+          menu={menu}
+          addToOrder={isClosingConfirmed ? undefined : addToOrder}
+        />
+        <OrderList
+          orders={orders}
+          cancelOrder={isClosingConfirmed ? undefined : handleCancelOrder}
+        />
       </div>
       <div className="order-1 md:order-2">
         <OrderForm

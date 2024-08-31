@@ -1,5 +1,5 @@
 "use client"
-import { Menu, Order, OrderInput, OrderItem, OrderItemInput, useCancelOrderMutation, useCreateOrderMutation, useGetOrdersQuery } from "@/lib/graphql/graphql";
+import { Menu, Order, OrderInput, OrderItemInput, useCancelOrderMutation, useCreateOrderMutation, useGetOrdersQuery } from "@/lib/graphql/graphql";
 import { useEffect, useState } from "react";
 
 export const useOrder = () => {
@@ -55,11 +55,11 @@ export const useOrder = () => {
   const placeOrder = async () => {
     if (!newOrder.ticketNumber) {
       setErrorMessage("番号札を入力してください。");
-      return;
+      throw new Error("注文の送信に失敗しました。");
     }
     if (newOrder.items.length === 0) {
       setErrorMessage("注文を追加してください。");
-      return;
+      throw new Error("注文の送信に失敗しました。");
     }
 
     try {
@@ -75,16 +75,7 @@ export const useOrder = () => {
       });
 
       if (result.data) {
-        setOrders(prevOrders => [
-          ...prevOrders,
-          {
-            id: result.data!.createOrder,
-            createdAt: new Date().toLocaleString(),
-            items: convertOrderItemInputsToOrderItems(newOrder.items),
-            ticketNumber: newOrder.ticketNumber,
-            totalAmount: newOrder.totalAmount,
-          },
-        ]);
+        await refreshOrders()
         setNewOrder(initializeNewOrder());
         setErrorMessage(null);
       } else {
@@ -101,7 +92,7 @@ export const useOrder = () => {
     try {
       const result = await deleteOrder({ variables: { id } });
       if (result.data?.cancelOrder) {
-        setOrders(prevOrders => prevOrders.filter(order => order.id !== id));
+        await refreshOrders()
       } else {
         throw new Error('注文のキャンセルに失敗しました');
       }
@@ -110,13 +101,6 @@ export const useOrder = () => {
       throw new Error("注文のキャンセルに失敗しました。");
     }
   };
-
-  const convertOrderItemInputsToOrderItems = (inputs: OrderItemInput[]): OrderItem[] => 
-    inputs.map(input => ({
-      name: input.menu.name,
-      price: input.price,
-      quantity: input.quantity,
-    }));
 
   const handleTicketNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const ticketNumber = parseInt(e.target.value, 10);
@@ -129,7 +113,7 @@ export const useOrder = () => {
     }
   };
 
-  const { data: getOrdersData, loading: getOrderLoading, error: getOrderError } = useGetOrdersQuery();
+  const { data: getOrdersData, loading: getOrderLoading, error: getOrderError, refetch: refreshOrders } = useGetOrdersQuery();
 
   useEffect(() => {
     if (!getOrderLoading && !getOrderError && getOrdersData?.getOrders) {

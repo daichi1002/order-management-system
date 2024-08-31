@@ -3,11 +3,13 @@ scalar DateTime
 type Query {
   getMenus: [Menu!]!
   getOrders: [Order!]!
+  isSalesConfirmed(date: DateTime!): Boolean!
 }
 
 type Mutation {
   createOrder(input: OrderInput!): ID!
   cancelOrder(id: ID!): Boolean!
+  createDailyClosing(input: DailyClosingInput): Boolean!
 }
 
 type Menu {
@@ -47,4 +49,10 @@ input MenuInput {
   id: ID!
   name: String!
   price: Float!
+}
+
+input DailyClosingInput {
+  closingDate: DateTime!
+  totalSales: Float!
+  totalOrders: Int!
 }

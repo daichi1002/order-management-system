@@ -30,3 +30,9 @@ export const formatDateTime = (dateString: string, format: string = "YYYY/MM/DD 
     .replace("mm", minutes)
     .replace("ss", seconds);
 };
+
+// 今日の日付を取得するユーティリティ関数
+export const getTodayDate = () => {
+  const today = new Date();
+  return `${today.getFullYear()}/${today.getMonth() + 1}/${today.getDate()}`;
+};

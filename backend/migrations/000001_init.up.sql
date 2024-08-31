@@ -38,9 +38,7 @@ CREATE TABLE daily_closings (
     closing_date DATE NOT NULL,
     total_sales DECIMAL(15, 2) NOT NULL DEFAULT 0.00,
     total_orders INT NOT NULL DEFAULT 0,
-    total_voids INT NOT NULL DEFAULT 0,
-    notes TEXT,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMP DEFAULT NULL
+    created_at TIMESTAMP with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP with time zone DEFAULT CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMP with time zone DEFAULT NULL
 );

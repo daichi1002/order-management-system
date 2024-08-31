@@ -10,7 +10,10 @@ import (
 	"time"
 
 	"github.com/daichi1002/order-management-system/backend/internal/adapter/graph/generated"
+	"github.com/daichi1002/order-management-system/backend/internal/adapter/graph/scalar"
 	"github.com/daichi1002/order-management-system/backend/internal/domain/model"
+	"github.com/daichi1002/order-management-system/backend/internal/infrastructure/logger"
+	"go.uber.org/zap"
 )
 
 // CreateOrder is the resolver for the createOrder field.
@@ -31,6 +34,7 @@ func (r *mutationResolver) CreateOrder(ctx context.Context, input generated.Orde
 	id, err := r.orderUsecase.CreateOrder(ctx, order, orderItems)
 
 	if err != nil {
+		logger.Error("server error", zap.Error(err))
 		return "", err
 	}
 
@@ -48,6 +52,25 @@ func (r *mutationResolver) CancelOrder(ctx context.Context, id string) (bool, er
 	err = r.orderUsecase.CancelOrder(ctx, orderId)
 
 	if err != nil {
+		logger.Error("server error", zap.Error(err))
+		return false, err
+	}
+
+	return true, nil
+}
+
+// CreateDailyClosing is the resolver for the createDailyClosing field.
+func (r *mutationResolver) CreateDailyClosing(ctx context.Context, input *generated.DailyClosingInput) (bool, error) {
+	dailyClosing, err := model.NewDailyClosing(time.Time(input.ClosingDate), input.TotalSales, input.TotalOrders)
+
+	if err != nil {
+		return false, err
+	}
+
+	err = r.dailyClosingUsecase.CreateDailyClosings(ctx, *dailyClosing)
+
+	if err != nil {
+		logger.Error("server error", zap.Error(err))
 		return false, err
 	}
 
@@ -59,6 +82,7 @@ func (r *queryResolver) GetMenus(ctx context.Context) ([]*generated.Menu, error)
 	menus, err := r.menuUsecase.GetMenus(ctx)
 
 	if err != nil {
+		logger.Error("server error", zap.Error(err))
 		return nil, err
 	}
 
@@ -78,10 +102,22 @@ func (r *queryResolver) GetOrders(ctx context.Context) ([]*generated.Order, erro
 	orders, err := r.orderUsecase.GetOrders(ctx)
 
 	if err != nil {
+		logger.Error("server error", zap.Error(err))
 		return nil, err
 	}
 
 	return orders, nil
+}
+
+// IsSalesConfirmed is the resolver for the isSalesConfirmed field.
+func (r *queryResolver) IsSalesConfirmed(ctx context.Context, date scalar.DateTime) (bool, error) {
+	isConfirmed, err := r.dailyClosingUsecase.IsSalesConfirmed(ctx, time.Time(date))
+
+	if err != nil {
+		logger.Error("server error", zap.Error(err))
+	}
+
+	return isConfirmed, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

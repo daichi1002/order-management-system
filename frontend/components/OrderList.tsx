@@ -1,18 +1,12 @@
 import { Order } from "@/lib/graphql/graphql";
-import { formatDateTime } from "@/lib/utils";
+import { formatDateTime, getTodayDate } from "@/lib/utils";
 import React, { useState } from "react";
 import { Pagination } from "./layout/Pagenation";
 import { OrderCancelDialog } from "./OrderCancelDialog";
 
-// 今日の日付を取得するユーティリティ関数
-const getTodayDate = () => {
-  const today = new Date();
-  return `${today.getFullYear()}/${today.getMonth() + 1}/${today.getDate()}`;
-};
-
 interface OrderListProps {
   orders: Order[];
-  cancelOrder: (id: string) => void;
+  cancelOrder?: (id: string) => void;
 }
 
 export const OrderList: React.FC<OrderListProps> = ({
@@ -48,7 +42,7 @@ export const OrderList: React.FC<OrderListProps> = ({
               <th className="px-4 py-2 text-center">注文内容</th>
               <th className="px-4 py-2 text-center">番号札</th>
               <th className="px-4 py-2 text-center">合計</th>
-              <th className="px-4 py-2 text-center">注文時間</th>{" "}
+              <th className="px-4 py-2 text-center">注文時間</th>
               <th className="px-4 py-2 text-center">操作</th>
             </tr>
           </thead>
@@ -71,16 +65,18 @@ export const OrderList: React.FC<OrderListProps> = ({
                   {formatDateTime(order.createdAt, "HH:mm:ss")}
                 </td>
                 <td className="px-4 py-2 text-center">
-                  <OrderCancelDialog
-                    order={{
-                      id: order.id,
-                      ticketNumber: order.ticketNumber,
-                      totalAmount: order.totalAmount,
-                      items: order.items,
-                      createdAt: order.createdAt,
-                    }}
-                    onConfirm={cancelOrder}
-                  />
+                  {cancelOrder && (
+                    <OrderCancelDialog
+                      order={{
+                        id: order.id,
+                        ticketNumber: order.ticketNumber,
+                        totalAmount: order.totalAmount,
+                        items: order.items,
+                        createdAt: order.createdAt,
+                      }}
+                      onConfirm={cancelOrder}
+                    />
+                  )}
                 </td>
               </tr>
             ))}

@@ -2,7 +2,7 @@ import { Menu } from "@/lib/graphql/graphql";
 
 interface MenuListProps {
   menu: Menu[];
-  addToOrder: (item: Menu) => void;
+  addToOrder?: (item: Menu) => void; // オプショナルに変更
 }
 
 export const MenuList: React.FC<MenuListProps> = ({ menu, addToOrder }) => (
@@ -12,8 +12,10 @@ export const MenuList: React.FC<MenuListProps> = ({ menu, addToOrder }) => (
       {menu.map((item) => (
         <li
           key={item.id}
-          className="bg-white rounded-lg shadow-md p-4 cursor-pointer hover:bg-gray-100"
-          onClick={() => addToOrder(item)}
+          className={`bg-white rounded-lg shadow-md p-4 ${
+            addToOrder ? "cursor-pointer hover:bg-gray-100" : "opacity-50"
+          }`}
+          onClick={() => addToOrder && addToOrder(item)}
         >
           <h3 className="text-lg font-bold">{item.name}</h3>
           <p className="text-gray-500">¥{item.price}</p>

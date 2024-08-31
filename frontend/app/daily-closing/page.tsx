@@ -1,68 +1,120 @@
-/**
- * v0 by Vercel.
- * @see https://v0.dev/t/jwmn1I9vIZq
- * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
- */
-import { Button } from "@/components/ui/button";
+"use client";
+import DailyClosingDialog from "@/components/DailyClosingDialog";
+import DailyClosingOrderList from "@/components/DailyClosingOrderList";
+import { ErrorMessage } from "@/components/layout/Error";
+import { LoadingSpinner } from "@/components/layout/Loading";
+import { Pagination } from "@/components/layout/Pagenation";
+import { useToast } from "@/components/ui/use-toast";
+import { useDailyClosing } from "@/hooks/useDailyClosing";
+import { useOrder } from "@/hooks/useOrder";
+import { withErrorHandling } from "@/lib/toast-utils";
+import { getTodayDate } from "@/lib/utils";
+import { useMemo, useState } from "react";
 
-export default function Component() {
+export default function DailyClosing() {
+  const { orders, getOrderLoading, getOrderError } = useOrder();
+  const { createData, useIsSalesConfirmed } = useDailyClosing();
+  const { toast } = useToast();
+  const [currentPage, setCurrentPage] = useState(1);
+  const ordersPerPage = 10;
+
+  const today = useMemo(() => new Date().toISOString(), []); // メモ化して再レンダリング時に日付が変わらないようにする
+
+  const {
+    data: salesConfirmedData,
+    loading: salesConfirmedLoading,
+    error: salesConfirmedError,
+    refetch: refetchSalesConfirmed,
+  } = useIsSalesConfirmed(today);
+
+  if (getOrderLoading || salesConfirmedLoading) return <LoadingSpinner />;
+  if (getOrderError || salesConfirmedError) return <ErrorMessage />;
+
+  const totalAmount = orders.reduce(
+    (total, order) => total + order.totalAmount,
+    0
+  );
+  const totalOrders = orders.length;
+  const totalPages = Math.ceil(totalOrders / ordersPerPage);
+
+  const handleSalesConfirmation = withErrorHandling(
+    async () => {
+      await createData(today, totalAmount, totalOrders);
+      await refetchSalesConfirmed();
+    },
+    "売上が確定しました。",
+    "売上の確定に失敗しました。もう一度お試しください。",
+    toast
+  );
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const isClosingConfirmed = salesConfirmedData?.isSalesConfirmed;
+
   return (
     <div className="bg-background text-foreground p-6 md:p-8 lg:p-10">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold">本日の売上</h1>
-          <div className="text-sm text-muted-foreground">2023年8月20日</div>
+          <div className="text-sm text-muted-foreground">{getTodayDate()}</div>
         </div>
         <div className="bg-card rounded-lg border border-gray-300 p-6 md:p-8 lg:p-10">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <div>
-              <h2 className="text-lg font-medium mb-2">本日の売上合計</h2>
-              <div className="text-4xl font-bold">¥345,678</div>
-            </div>
-          </div>
+          <TotalAmount totalAmount={totalAmount} totalOrders={totalOrders} />
           <div className="mb-8">
             <h2 className="text-lg font-medium mb-4">注文一覧</h2>
-            <div className="bg-muted rounded-lg p-4">
-              <div className="grid grid-cols-[80px_1fr_100px] gap-4 border-b pb-4 mb-4 last:mb-0 last:border-b-0">
-                <div className="text-muted-foreground text-sm">時間</div>
-                <div className="text-muted-foreground text-sm">商品</div>
-                <div className="text-muted-foreground text-sm text-right">
-                  金額
-                </div>
-              </div>
-              <div className="grid grid-cols-[80px_1fr_100px] gap-4 border-b pb-4 mb-4 last:mb-0 last:border-b-0">
-                <div className="font-medium">11:00</div>
-                <div>
-                  <div>ラーメン x 2</div>
-                  <div>餃子 x 1</div>
-                </div>
-                <div className="font-medium text-right">¥2,000</div>
-              </div>
-              <div className="grid grid-cols-[80px_1fr_100px] gap-4 border-b pb-4 mb-4 last:mb-0 last:border-b-0">
-                <div className="font-medium">11:30</div>
-                <div>
-                  <div>焼き鳥 x 3</div>
-                  <div>ビール x 2</div>
-                </div>
-                <div className="font-medium text-right">¥3,500</div>
-              </div>
-              <div className="grid grid-cols-[80px_1fr_100px] gap-4 border-b pb-4 mb-4 last:mb-0 last:border-b-0">
-                <div className="font-medium">12:00</div>
-                <div>
-                  <div>カレー x 1</div>
-                  <div>ソフトドリンク x 1</div>
-                </div>
-                <div className="font-medium text-right">¥1,200</div>
-              </div>
+            <DailyClosingOrderList
+              orders={orders}
+              currentPage={currentPage}
+              ordersPerPage={ordersPerPage}
+            />
+            <div className="mt-4">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
             </div>
           </div>
-          <div className="flex items-center justify-between">
-            <div className="text-2xl font-bold">合計: ¥345,678</div>
-            <div className="flex gap-4">
-              <Button>売上確定</Button>
-            </div>
+          <div className="flex justify-end">
+            {!isClosingConfirmed ? (
+              <DailyClosingDialog
+                totalAmount={totalAmount}
+                totalOrders={totalOrders}
+                onConfirm={handleSalesConfirmation}
+              />
+            ) : (
+              <div className="text-green-600 font-bold">
+                売上が確定されました。
+              </div>
+            )}
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// TotalAmountコンポーネント
+function TotalAmount({
+  totalAmount,
+  totalOrders,
+}: {
+  totalAmount: number;
+  totalOrders: number;
+}) {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <div>
+        <h2 className="text-lg font-medium mb-2">売上金額</h2>
+        <div className="text-4xl font-bold">
+          ¥{totalAmount.toLocaleString()}
+        </div>
+      </div>
+      <div>
+        <h2 className="text-lg font-medium mb-2">注文数</h2>
+        <div className="text-4xl font-bold">{totalOrders}件</div>
       </div>
     </div>
   );

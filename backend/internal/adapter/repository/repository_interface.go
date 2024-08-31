@@ -21,3 +21,8 @@ type OrderItemRepository interface {
 	CreateOrderItems(ctx context.Context, tx *gorm.DB, orderItems []*model.OrderItem) error
 	DeleteOrderItems(ctx context.Context, tx *gorm.DB, id int) error
 }
+
+type DailyClosingRepository interface {
+	CreateDailyClosing(ctx context.Context, input model.DailyClosing) error
+	IsSalesConfirmed(ctx context.Context, date string) (bool, error)
+}
