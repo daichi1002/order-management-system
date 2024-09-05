@@ -4,6 +4,8 @@ import DailyClosingOrderList from "@/components/DailyClosingOrderList";
 import { ErrorMessage } from "@/components/layout/Error";
 import { LoadingSpinner } from "@/components/layout/Loading";
 import { Pagination } from "@/components/layout/Pagenation";
+import MonthlySummary from "@/components/MonthlyReport";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
 import { useDailyClosing } from "@/hooks/useDailyClosing";
 import { useOrder } from "@/hooks/useOrder";
@@ -11,8 +13,9 @@ import { withErrorHandling } from "@/lib/toast-utils";
 import { getTodayDate } from "@/lib/utils";
 import { useMemo, useState } from "react";
 
-export default function DailyClosing() {
+const OrderManagementSystem = () => {
   const { orders, getOrderLoading, getOrderError } = useOrder();
+
   const { createData, useIsSalesConfirmed } = useDailyClosing();
   const { toast } = useToast();
   const [currentPage, setCurrentPage] = useState(1);
@@ -54,47 +57,67 @@ export default function DailyClosing() {
   const isClosingConfirmed = salesConfirmedData?.isSalesConfirmed;
 
   return (
-    <div className="bg-background text-foreground p-6 md:p-8 lg:p-10">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold">本日の売上</h1>
-          <div className="text-sm text-muted-foreground">{getTodayDate()}</div>
-        </div>
-        <div className="bg-card rounded-lg border border-gray-300 p-6 md:p-8 lg:p-10">
-          <TotalAmount totalAmount={totalAmount} totalOrders={totalOrders} />
-          <div className="mb-8">
-            <h2 className="text-lg font-medium mb-4">注文一覧</h2>
-            <DailyClosingOrderList
-              orders={orders}
-              currentPage={currentPage}
-              ordersPerPage={ordersPerPage}
-            />
-            <div className="mt-4">
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-              />
+    <Tabs defaultValue="daily" className="w-full">
+      <TabsList>
+        <TabsTrigger value="daily">日締め</TabsTrigger>
+        <TabsTrigger value="monthly">月締め</TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="daily">
+        <div className="bg-background text-foreground p-6 md:p-8 lg:p-10">
+          <div className="max-w-4xl mx-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h1 className="text-2xl font-bold">本日の売上</h1>
+              <div className="text-sm text-muted-foreground">
+                {getTodayDate()}
+              </div>
             </div>
-          </div>
-          <div className="flex justify-end">
-            {!isClosingConfirmed ? (
-              <DailyClosingDialog
+            <div className="bg-card rounded-lg border border-gray-300 p-6 md:p-8 lg:p-10">
+              <TotalAmount
                 totalAmount={totalAmount}
                 totalOrders={totalOrders}
-                onConfirm={handleSalesConfirmation}
               />
-            ) : (
-              <div className="text-green-600 font-bold">
-                売上が確定されました。
+              <div className="mb-8">
+                <h2 className="text-lg font-medium mb-4">注文一覧</h2>
+                <DailyClosingOrderList
+                  orders={orders}
+                  currentPage={currentPage}
+                  ordersPerPage={ordersPerPage}
+                />
+                <div className="mt-4">
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                  />
+                </div>
               </div>
-            )}
+              <div className="flex justify-end">
+                {!isClosingConfirmed ? (
+                  <DailyClosingDialog
+                    totalAmount={totalAmount}
+                    totalOrders={totalOrders}
+                    onConfirm={handleSalesConfirmation}
+                  />
+                ) : (
+                  <div className="text-green-600 font-bold">
+                    売上が確定されました。
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
+      </TabsContent>
+
+      <TabsContent value="monthly">
+        <MonthlySummary />
+      </TabsContent>
+    </Tabs>
   );
-}
+};
+
+export default OrderManagementSystem;
 
 // TotalAmountコンポーネント
 function TotalAmount({
