@@ -33,9 +33,9 @@ CREATE TABLE order_items (
     FOREIGN KEY (menu_id) REFERENCES menus(id) ON DELETE CASCADE
 );
 
-CREATE TABLE daily_closings (
+CREATE TABLE sales (
     id SERIAL PRIMARY KEY,
-    closing_date DATE NOT NULL,
+    date DATE NOT NULL,
     total_sales DECIMAL(15, 2) NOT NULL DEFAULT 0.00,
     total_orders INT NOT NULL DEFAULT 0,
     created_at TIMESTAMP with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,

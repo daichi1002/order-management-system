@@ -36,11 +36,11 @@ const Header = () => {
           注文履歴
         </Link>
         <Link
-          href="/daily-closing"
+          href="/sales"
           className="text-muted-foreground"
           prefetch={false}
         >
-          締め作業
+          売上管理
         </Link>
       </nav>
       <div className="ml-auto flex items-center gap-4">

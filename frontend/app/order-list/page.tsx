@@ -3,6 +3,15 @@ import { ErrorMessage } from "@/components/layout/Error";
 import { LoadingSpinner } from "@/components/layout/Loading";
 import { Pagination } from "@/components/layout/Pagenation";
 import { OrderCancelDialog } from "@/components/OrderCancelDialog";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { useToast } from "@/components/ui/use-toast";
 import { useDailyClosing } from "@/hooks/useDailyClosing";
 import { useOrder } from "@/hooks/useOrder";
@@ -45,66 +54,70 @@ export default function OrderListPage() {
   if (getOrderError) return <ErrorMessage />;
 
   return (
-    <div className="container mx-auto px-4 text-lg">
-      <h2 className="text-2xl font-bold mt-8 mb-2">
-        注文履歴 ({getTodayDate()})
-      </h2>
-      <div className="bg-white rounded-lg shadow-md overflow-x-auto mb-0">
-        <table className="w-full table-auto text-left">
-          <thead>
-            <tr className="bg-muted">
-              <th className="px-4 py-2 text-center">注文ID</th>
-              <th className="px-4 py-2 text-center">注文内容</th>
-              <th className="px-4 py-2 text-center">番号札</th>
-              <th className="px-4 py-2 text-center">合計</th>
-              <th className="px-4 py-2 text-center">注文時間</th>
-              <th className="px-4 py-2 text-center">操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentOrders.map((order) => (
-              <tr key={order.id} className={`border-b bg-white`}>
-                <td className="px-4 py-2 text-center">{order.id}</td>
-                <td className="px-4 py-2 text-center">
-                  <ul className="space-y-1">
-                    {order.items.map((item, index) => (
-                      <li key={index}>
-                        {item.name} x {item.quantity}
-                      </li>
-                    ))}
-                  </ul>
-                </td>
-                <td className="px-4 py-2 text-center">{order.ticketNumber}</td>
-                <td className="px-4 py-2 text-center">¥{order.totalAmount}</td>
-                <td className="px-4 py-2 text-center">
-                  {formatDateTime(order.createdAt, "HH:mm:ss")}
-                </td>
-                <td className="px-4 py-2 text-center">
-                  {!salesConfirmedData?.isSalesConfirmed && (
-                    <OrderCancelDialog
-                      order={{
-                        id: order.id,
-                        ticketNumber: order.ticketNumber,
-                        totalAmount: order.totalAmount,
-                        items: order.items,
-                        createdAt: order.createdAt,
-                      }}
-                      onConfirm={handleCancelOrder}
-                    />
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <div className="bg-muted">
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-          />
-        </div>
-      </div>
+    <div className="p-8 max-w-7xl mx-auto space-y-8">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-xl font-semibold">
+            注文履歴 ({getTodayDate()})
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>注文ID</TableHead>
+                <TableHead>注文内容</TableHead>
+                <TableHead>番号札</TableHead>
+                <TableHead>合計</TableHead>
+                <TableHead>注文時間</TableHead>
+                <TableHead>操作</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {currentOrders.map((order) => (
+                <TableRow key={order.id}>
+                  <TableCell>{order.id}</TableCell>
+                  <TableCell>
+                    <ul className="space-y-1">
+                      {order.items.map((item, index) => (
+                        <li key={index}>
+                          {item.name} x {item.quantity}
+                        </li>
+                      ))}
+                    </ul>
+                  </TableCell>
+                  <TableCell>{order.ticketNumber}</TableCell>
+                  <TableCell>¥{order.totalAmount}</TableCell>
+                  <TableCell>
+                    {formatDateTime(order.createdAt, "HH:mm:ss")}
+                  </TableCell>
+                  <TableCell>
+                    {!salesConfirmedData?.isSalesConfirmed && (
+                      <OrderCancelDialog
+                        order={{
+                          id: order.id,
+                          ticketNumber: order.ticketNumber,
+                          totalAmount: order.totalAmount,
+                          items: order.items,
+                          createdAt: order.createdAt,
+                        }}
+                        onConfirm={handleCancelOrder}
+                      />
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          <div>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

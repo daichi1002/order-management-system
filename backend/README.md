@@ -85,8 +85,8 @@ VALUES
     (2, 2, 1, 750.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
     (3, 4, 1, 850.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
--- `daily_closings` テーブルにテストデータを挿入
-INSERT INTO "daily_closings" ("closing_date", "total_sales", "total_orders", "total_voids", "notes", "created_at", "updated_at")
+-- `sales` テーブルにテストデータを挿入
+INSERT INTO "sales" ("date", "total_sales", "total_orders", "total_voids", "notes", "created_at", "updated_at")
 VALUES
     ('2024-08-23', 4050.00, 3, 0, 'No special notes.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
