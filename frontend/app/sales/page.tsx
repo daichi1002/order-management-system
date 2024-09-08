@@ -253,7 +253,7 @@ const MonthlySummary: React.FC = () => {
                   </TableCell>
                   <TableCell>
                     {order.items.map((item, index) => (
-                      <div>
+                      <div key={index}>
                         {item.name} x {item.quantity}
                       </div>
                     ))}
