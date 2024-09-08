@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"strconv"
+	"time"
 
 	"github.com/daichi1002/order-management-system/backend/internal/adapter/graph/generated"
 	"github.com/daichi1002/order-management-system/backend/internal/adapter/graph/scalar"
@@ -46,8 +47,8 @@ func (u *orderUsecase) CreateOrder(ctx context.Context, order *model.Order, orde
 	return id, nil
 }
 
-func (u *orderUsecase) GetOrders(ctx context.Context) ([]*generated.Order, error) {
-	orders, err := u.orderRepository.GetTodayOrdersWithDetails(ctx)
+func (u *orderUsecase) GetOrders(ctx context.Context, dateTime time.Time) ([]*generated.Order, error) {
+	orders, err := u.orderRepository.GetOrdersWithDetails(ctx, dateTime)
 	if err != nil {
 		return nil, err
 	}

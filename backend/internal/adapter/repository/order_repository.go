@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/daichi1002/order-management-system/backend/internal/domain/model"
-	"github.com/daichi1002/order-management-system/backend/internal/util"
 	"gorm.io/gorm"
 )
 
@@ -28,10 +27,9 @@ func (r *orderRepository) CreateOrder(ctx context.Context, tx *gorm.DB, data *mo
 	return data.Id, nil
 }
 
-func (r *orderRepository) GetTodayOrdersWithDetails(ctx context.Context) ([]*model.Order, error) {
+func (r *orderRepository) GetOrdersWithDetails(ctx context.Context, dateTime time.Time) ([]*model.Order, error) {
 	var orders []*model.Order
-	now := util.NowFunc()
-	startOfDay := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
+	startOfDay := time.Date(dateTime.Year(), dateTime.Month(), dateTime.Day(), 0, 0, 0, 0, dateTime.Location())
 	endOfDay := startOfDay.Add(24 * time.Hour)
 
 	result := r.db.WithContext(ctx).Preload("Items.Menu").

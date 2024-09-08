@@ -6,8 +6,8 @@ mutation CancelOrder($id: ID!) {
   cancelOrder(id: $id)
 }
 
-query GetOrders {
-  getOrders {
+query GetOrders($dateTime: DateTime!) {
+  getOrders(dateTime: $dateTime) {
     id
     items {
       name

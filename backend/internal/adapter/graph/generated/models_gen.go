@@ -6,12 +6,6 @@ import (
 	"github.com/daichi1002/order-management-system/backend/internal/adapter/graph/scalar"
 )
 
-type DailyClosingInput struct {
-	ClosingDate scalar.DateTime `json:"closingDate"`
-	TotalSales  float64         `json:"totalSales"`
-	TotalOrders int             `json:"totalOrders"`
-}
-
 type Menu struct {
 	ID    string  `json:"id"`
 	Name  string  `json:"name"`

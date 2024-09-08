@@ -59,24 +59,6 @@ func (r *mutationResolver) CancelOrder(ctx context.Context, id string) (bool, er
 	return true, nil
 }
 
-// CreateDailyClosing is the resolver for the createDailyClosing field.
-func (r *mutationResolver) CreateDailyClosing(ctx context.Context, input *generated.DailyClosingInput) (bool, error) {
-	dailyClosing, err := model.NewDailyClosing(time.Time(input.ClosingDate), input.TotalSales, input.TotalOrders)
-
-	if err != nil {
-		return false, err
-	}
-
-	err = r.dailyClosingUsecase.CreateDailyClosings(ctx, *dailyClosing)
-
-	if err != nil {
-		logger.Error("server error", zap.Error(err))
-		return false, err
-	}
-
-	return true, nil
-}
-
 // GetMenus is the resolver for the getMenus field.
 func (r *queryResolver) GetMenus(ctx context.Context) ([]*generated.Menu, error) {
 	menus, err := r.menuUsecase.GetMenus(ctx)
@@ -98,8 +80,8 @@ func (r *queryResolver) GetMenus(ctx context.Context) ([]*generated.Menu, error)
 }
 
 // GetOrders is the resolver for the getOrders field.
-func (r *queryResolver) GetOrders(ctx context.Context) ([]*generated.Order, error) {
-	orders, err := r.orderUsecase.GetOrders(ctx)
+func (r *queryResolver) GetOrders(ctx context.Context, dateTime scalar.DateTime) ([]*generated.Order, error) {
+	orders, err := r.orderUsecase.GetOrders(ctx, time.Time(dateTime))
 
 	if err != nil {
 		logger.Error("server error", zap.Error(err))
@@ -107,17 +89,6 @@ func (r *queryResolver) GetOrders(ctx context.Context) ([]*generated.Order, erro
 	}
 
 	return orders, nil
-}
-
-// IsSalesConfirmed is the resolver for the isSalesConfirmed field.
-func (r *queryResolver) IsSalesConfirmed(ctx context.Context, date scalar.DateTime) (bool, error) {
-	isConfirmed, err := r.dailyClosingUsecase.IsSalesConfirmed(ctx, time.Time(date))
-
-	if err != nil {
-		logger.Error("server error", zap.Error(err))
-	}
-
-	return isConfirmed, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

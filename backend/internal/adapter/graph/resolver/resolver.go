@@ -14,7 +14,6 @@ import (
 type Resolver struct {
 	menuUsecase         usecase.MenuUsecase
 	orderUsecase        usecase.OrderUsecase
-	dailyClosingUsecase usecase.DailyClosingUsecase
 }
 
 func NewResolver(db *gorm.DB) *Resolver {
@@ -23,15 +22,13 @@ func NewResolver(db *gorm.DB) *Resolver {
 	menuRepository := repository.NewMenuRepository(db)
 	orderRepository := repository.NewOrderRepository(db)
 	orderItemRepository := repository.NewOrderItemRepository(db)
-	dailyClosingRepository := repository.NewDailyClosingRepository(db)
 
 	menuUsecase := usecase.NewMenuUsecase(menuRepository)
 	orderUsecase := usecase.NewOrderUsecase(txManager, orderRepository, orderItemRepository)
-	dailyClosingUsecase := usecase.NewDailyClosingUsecase(dailyClosingRepository)
 
 	return &Resolver{
 		menuUsecase:         menuUsecase,
 		orderUsecase:        orderUsecase,
-		dailyClosingUsecase: dailyClosingUsecase,
+
 	}
 }

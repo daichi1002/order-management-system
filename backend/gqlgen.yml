@@ -15,3 +15,6 @@ models:
   DateTime:
     model:
       - github.com/daichi1002/order-management-system/backend/internal/adapter/graph/scalar.DateTime
+  Date:
+    model:
+      - github.com/daichi1002/order-management-system/backend/internal/adapter/graph/scalar.Date

@@ -4,7 +4,6 @@ import { LoadingSpinner } from "@/components/layout/Loading";
 import { MenuList } from "@/components/MenuList";
 import { OrderForm } from "@/components/OrderForm";
 import { useToast } from "@/components/ui/use-toast";
-import { useDailyClosing } from "@/hooks/useDailyClosing";
 import { useMenu } from "@/hooks/useMenu";
 import { useOrder } from "@/hooks/useOrder";
 import { withErrorHandling } from "@/lib/toast-utils";
@@ -25,15 +24,9 @@ export default function OrderPage() {
   const { toast } = useToast();
 
   const today = useMemo(() => new Date().toISOString(), []);
-  const { useIsSalesConfirmed } = useDailyClosing();
-  const { data: salesConfirmedData, loading: salesConfirmedLoading } =
-    useIsSalesConfirmed(today);
 
-  if (menuLoading || getOrderLoading || salesConfirmedLoading)
-    return <LoadingSpinner />;
+  if (menuLoading || getOrderLoading) return <LoadingSpinner />;
   if (menuError || getOrderError) return <ErrorMessage />;
-
-  const isClosingConfirmed = salesConfirmedData?.isSalesConfirmed;
 
   const handlePlaceOrder = withErrorHandling(
     placeOrder,
@@ -45,10 +38,7 @@ export default function OrderPage() {
   return (
     <div className="container mx-auto px-4 py-8 text-lg grid grid-cols-1 md:grid-cols-3 gap-8">
       <div className="order-2 md:order-1 md:col-span-2">
-        <MenuList
-          menu={menu}
-          addToOrder={isClosingConfirmed ? undefined : addToOrder}
-        />
+        <MenuList menu={menu} addToOrder={addToOrder} />
       </div>
       <div className="order-1 md:order-2">
         <OrderForm

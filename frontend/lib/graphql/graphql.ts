@@ -18,12 +18,6 @@ export type Scalars = {
   DateTime: { input: any; output: any; }
 };
 
-export type DailyClosingInput = {
-  closingDate: Scalars['DateTime']['input'];
-  totalOrders: Scalars['Int']['input'];
-  totalSales: Scalars['Float']['input'];
-};
-
 export type Menu = {
   __typename?: 'Menu';
   id: Scalars['ID']['output'];
@@ -40,18 +34,12 @@ export type MenuInput = {
 export type Mutation = {
   __typename?: 'Mutation';
   cancelOrder: Scalars['Boolean']['output'];
-  createDailyClosing: Scalars['Boolean']['output'];
   createOrder: Scalars['ID']['output'];
 };
 
 
 export type MutationCancelOrderArgs = {
   id: Scalars['ID']['input'];
-};
-
-
-export type MutationCreateDailyClosingArgs = {
-  input?: InputMaybe<DailyClosingInput>;
 };
 
 
@@ -92,27 +80,12 @@ export type Query = {
   __typename?: 'Query';
   getMenus: Array<Menu>;
   getOrders: Array<Order>;
-  isSalesConfirmed: Scalars['Boolean']['output'];
 };
 
 
-export type QueryIsSalesConfirmedArgs = {
-  date: Scalars['DateTime']['input'];
+export type QueryGetOrdersArgs = {
+  dateTime: Scalars['DateTime']['input'];
 };
-
-export type CreateDailyClosingMutationVariables = Exact<{
-  input: DailyClosingInput;
-}>;
-
-
-export type CreateDailyClosingMutation = { __typename?: 'Mutation', createDailyClosing: boolean };
-
-export type IsSalesConfirmedQueryVariables = Exact<{
-  date: Scalars['DateTime']['input'];
-}>;
-
-
-export type IsSalesConfirmedQuery = { __typename?: 'Query', isSalesConfirmed: boolean };
 
 export type GetMenusQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -133,81 +106,14 @@ export type CancelOrderMutationVariables = Exact<{
 
 export type CancelOrderMutation = { __typename?: 'Mutation', cancelOrder: boolean };
 
-export type GetOrdersQueryVariables = Exact<{ [key: string]: never; }>;
+export type GetOrdersQueryVariables = Exact<{
+  dateTime: Scalars['DateTime']['input'];
+}>;
 
 
 export type GetOrdersQuery = { __typename?: 'Query', getOrders: Array<{ __typename?: 'Order', id: string, totalAmount: number, ticketNumber: number, createdAt: any, items: Array<{ __typename?: 'OrderItem', name: string, quantity: number, price: number }> }> };
 
 
-export const CreateDailyClosingDocument = gql`
-    mutation CreateDailyClosing($input: DailyClosingInput!) {
-  createDailyClosing(input: $input)
-}
-    `;
-export type CreateDailyClosingMutationFn = Apollo.MutationFunction<CreateDailyClosingMutation, CreateDailyClosingMutationVariables>;
-
-/**
- * __useCreateDailyClosingMutation__
- *
- * To run a mutation, you first call `useCreateDailyClosingMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCreateDailyClosingMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [createDailyClosingMutation, { data, loading, error }] = useCreateDailyClosingMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useCreateDailyClosingMutation(baseOptions?: Apollo.MutationHookOptions<CreateDailyClosingMutation, CreateDailyClosingMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<CreateDailyClosingMutation, CreateDailyClosingMutationVariables>(CreateDailyClosingDocument, options);
-      }
-export type CreateDailyClosingMutationHookResult = ReturnType<typeof useCreateDailyClosingMutation>;
-export type CreateDailyClosingMutationResult = Apollo.MutationResult<CreateDailyClosingMutation>;
-export type CreateDailyClosingMutationOptions = Apollo.BaseMutationOptions<CreateDailyClosingMutation, CreateDailyClosingMutationVariables>;
-export const IsSalesConfirmedDocument = gql`
-    query IsSalesConfirmed($date: DateTime!) {
-  isSalesConfirmed(date: $date)
-}
-    `;
-
-/**
- * __useIsSalesConfirmedQuery__
- *
- * To run a query within a React component, call `useIsSalesConfirmedQuery` and pass it any options that fit your needs.
- * When your component renders, `useIsSalesConfirmedQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useIsSalesConfirmedQuery({
- *   variables: {
- *      date: // value for 'date'
- *   },
- * });
- */
-export function useIsSalesConfirmedQuery(baseOptions: Apollo.QueryHookOptions<IsSalesConfirmedQuery, IsSalesConfirmedQueryVariables> & ({ variables: IsSalesConfirmedQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<IsSalesConfirmedQuery, IsSalesConfirmedQueryVariables>(IsSalesConfirmedDocument, options);
-      }
-export function useIsSalesConfirmedLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<IsSalesConfirmedQuery, IsSalesConfirmedQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<IsSalesConfirmedQuery, IsSalesConfirmedQueryVariables>(IsSalesConfirmedDocument, options);
-        }
-export function useIsSalesConfirmedSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<IsSalesConfirmedQuery, IsSalesConfirmedQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<IsSalesConfirmedQuery, IsSalesConfirmedQueryVariables>(IsSalesConfirmedDocument, options);
-        }
-export type IsSalesConfirmedQueryHookResult = ReturnType<typeof useIsSalesConfirmedQuery>;
-export type IsSalesConfirmedLazyQueryHookResult = ReturnType<typeof useIsSalesConfirmedLazyQuery>;
-export type IsSalesConfirmedSuspenseQueryHookResult = ReturnType<typeof useIsSalesConfirmedSuspenseQuery>;
-export type IsSalesConfirmedQueryResult = Apollo.QueryResult<IsSalesConfirmedQuery, IsSalesConfirmedQueryVariables>;
 export const GetMenusDocument = gql`
     query GetMenus {
   getMenus {
@@ -312,8 +218,8 @@ export type CancelOrderMutationHookResult = ReturnType<typeof useCancelOrderMuta
 export type CancelOrderMutationResult = Apollo.MutationResult<CancelOrderMutation>;
 export type CancelOrderMutationOptions = Apollo.BaseMutationOptions<CancelOrderMutation, CancelOrderMutationVariables>;
 export const GetOrdersDocument = gql`
-    query GetOrders {
-  getOrders {
+    query GetOrders($dateTime: DateTime!) {
+  getOrders(dateTime: $dateTime) {
     id
     items {
       name
@@ -339,10 +245,11 @@ export const GetOrdersDocument = gql`
  * @example
  * const { data, loading, error } = useGetOrdersQuery({
  *   variables: {
+ *      dateTime: // value for 'dateTime'
  *   },
  * });
  */
-export function useGetOrdersQuery(baseOptions?: Apollo.QueryHookOptions<GetOrdersQuery, GetOrdersQueryVariables>) {
+export function useGetOrdersQuery(baseOptions: Apollo.QueryHookOptions<GetOrdersQuery, GetOrdersQueryVariables> & ({ variables: GetOrdersQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<GetOrdersQuery, GetOrdersQueryVariables>(GetOrdersDocument, options);
       }

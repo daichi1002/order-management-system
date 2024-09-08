@@ -13,11 +13,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useToast } from "@/components/ui/use-toast";
-import { useDailyClosing } from "@/hooks/useDailyClosing";
 import { useOrder } from "@/hooks/useOrder";
 import { withErrorHandling } from "@/lib/toast-utils";
 import { formatDateTime, getTodayDate } from "@/lib/utils";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 export default function OrderListPage() {
   const { orders, getOrderLoading, getOrderError, cancelOrder } = useOrder();
@@ -28,11 +27,6 @@ export default function OrderListPage() {
     "注文のキャンセルに失敗しました。もう一度お試しください。",
     toast
   );
-
-  const today = useMemo(() => new Date().toISOString(), []);
-  const { useIsSalesConfirmed } = useDailyClosing();
-  const { data: salesConfirmedData, loading: salesConfirmedLoading } =
-    useIsSalesConfirmed(today);
 
   const [currentPage, setCurrentPage] = useState(1);
   const ordersPerPage = 10;
@@ -50,7 +44,7 @@ export default function OrderListPage() {
     setCurrentPage(page);
   };
 
-  if (getOrderLoading || salesConfirmedLoading) return <LoadingSpinner />;
+  if (getOrderLoading) return <LoadingSpinner />;
   if (getOrderError) return <ErrorMessage />;
 
   return (
@@ -92,18 +86,16 @@ export default function OrderListPage() {
                     {formatDateTime(order.createdAt, "HH:mm:ss")}
                   </TableCell>
                   <TableCell>
-                    {!salesConfirmedData?.isSalesConfirmed && (
-                      <OrderCancelDialog
-                        order={{
-                          id: order.id,
-                          ticketNumber: order.ticketNumber,
-                          totalAmount: order.totalAmount,
-                          items: order.items,
-                          createdAt: order.createdAt,
-                        }}
-                        onConfirm={handleCancelOrder}
-                      />
-                    )}
+                    <OrderCancelDialog
+                      order={{
+                        id: order.id,
+                        ticketNumber: order.ticketNumber,
+                        totalAmount: order.totalAmount,
+                        items: order.items,
+                        createdAt: order.createdAt,
+                      }}
+                      onConfirm={handleCancelOrder}
+                    />
                   </TableCell>
                 </TableRow>
               ))}

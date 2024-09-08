@@ -33,6 +33,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useOrder } from "@/hooks/useOrder";
+import { Order } from "@/lib/graphql/graphql";
+import { formatDateTime } from "@/lib/utils";
 import {
   addMonths,
   eachDayOfInterval,
@@ -46,22 +49,15 @@ import {
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 
-interface Order {
-  id: number;
-  date: string;
-  amount: number;
-  customerName: string;
-}
-
 const maxVisiblePages = 5;
 const halfVisiblePages = Math.floor(maxVisiblePages / 2);
 
 const MonthlySummary: React.FC = () => {
-  const [orders, setOrders] = useState<Order[]>([]);
+  const { orders, updateDateTime } = useOrder();
   const [selectedMonth, setSelectedMonth] = useState<string>(
     new Date().toISOString().slice(0, 7)
   );
-  const [selectedDate, setSelectedDate] = useState<string>("all");
+  const [selectedDate, setSelectedDate] = useState<string>("");
   const [dailySales, setDailySales] = useState<{ [key: string]: number }>({});
   const [editingOrder, setEditingOrder] = useState<Order | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -76,65 +72,29 @@ const MonthlySummary: React.FC = () => {
     setSelectedDate(today);
   }, []);
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      const dummyOrders: Order[] = [];
-      const [year, month] = selectedMonth.split("-");
-      const daysInMonth = new Date(Number(year), Number(month), 0).getDate();
-      for (let day = 1; day <= daysInMonth; day++) {
-        for (let i = 0; i < 50; i++) {
-          dummyOrders.push({
-            id: dummyOrders.length + 1,
-            date: `${selectedMonth}-${day.toString().padStart(2, "0")}`,
-            amount: Math.floor(Math.random() * 10000) + 1000,
-            customerName: `顧客${dummyOrders.length + 1}`,
-          });
-        }
-      }
-      setOrders(dummyOrders);
-    };
-
-    fetchOrders();
-  }, [selectedMonth]);
-
-  useEffect(() => {
-    const salesData = orders.reduce((acc, order) => {
-      const date = order.date.slice(0, 10);
-      acc[date] = (acc[date] || 0) + order.amount;
-      return acc;
-    }, {} as { [key: string]: number });
-
-    setDailySales(salesData);
-  }, [orders]);
-
   const handleEditOrder = (order: Order) => {
     setEditingOrder(order);
     setIsEditDialogOpen(true);
   };
 
-  const handleDeleteOrder = (orderId: number) => {
-    setOrders(orders.filter((order) => order.id !== orderId));
+  const handleDeleteOrder = (orderId: string) => {
+    // setOrders(orders.filter((order) => order.id !== orderId));
   };
 
   const handleSaveEdit = () => {
     if (editingOrder) {
-      setOrders(
-        orders.map((order) =>
-          order.id === editingOrder.id ? editingOrder : order
-        )
-      );
+      // setOrders(
+      //   orders.map((order) =>
+      //     order.id === editingOrder.id ? editingOrder : order
+      //   )
+      // );
       setIsEditDialogOpen(false);
       setEditingOrder(null);
     }
   };
 
-  const filteredOrders =
-    selectedDate === "all"
-      ? orders
-      : orders.filter((order) => order.date === selectedDate);
-
-  const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
-  const paginatedOrders = filteredOrders.slice(
+  const totalPages = Math.ceil(orders.length / itemsPerPage);
+  const paginatedOrders = orders.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
@@ -146,6 +106,7 @@ const MonthlySummary: React.FC = () => {
   };
 
   const handleDateClick = (dateString: string) => {
+    updateDateTime(new Date(Date.parse(dateString)).toISOString());
     setSelectedDate(dateString);
     setCurrentPage(1);
     scrollToOrderList();
@@ -189,7 +150,7 @@ const MonthlySummary: React.FC = () => {
               onClick={() => handleDateClick(dateString)}
             >
               <div>{dayOfMonth}</div>
-              <div className="text-red-400">{sales.toLocaleString()}円</div>
+              <div className="text-red-400">¥{sales.toLocaleString()}</div>
             </div>
           );
         })}
@@ -203,8 +164,6 @@ const MonthlySummary: React.FC = () => {
   );
 
   const totalOrderCount = orders.length;
-  const averageOrderValue =
-    totalOrderCount > 0 ? totalMonthlySales / totalOrderCount : 0;
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-8">
       <Card>
@@ -265,21 +224,6 @@ const MonthlySummary: React.FC = () => {
                 <div className="text-2xl font-bold">{totalOrderCount}件</div>
               </CardContent>
             </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  平均注文金額
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  ¥
-                  {averageOrderValue.toLocaleString(undefined, {
-                    maximumFractionDigits: 0,
-                  })}
-                </div>
-              </CardContent>
-            </Card>
           </div>
           {renderCalendar()}
         </CardContent>
@@ -287,14 +231,16 @@ const MonthlySummary: React.FC = () => {
 
       <Card ref={orderListRef}>
         <CardHeader>
-          <CardTitle className="text-xl font-semibold">注文一覧</CardTitle>
+          <CardTitle className="text-xl font-semibold">
+            注文一覧 ({selectedDate})
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>日付</TableHead>
-                <TableHead>顧客名</TableHead>
+                <TableHead>時間</TableHead>
+                <TableHead>メニュー</TableHead>
                 <TableHead>金額</TableHead>
                 <TableHead>操作</TableHead>
               </TableRow>
@@ -302,9 +248,18 @@ const MonthlySummary: React.FC = () => {
             <TableBody>
               {paginatedOrders.map((order) => (
                 <TableRow key={order.id}>
-                  <TableCell>{order.date}</TableCell>
-                  <TableCell>{order.customerName}</TableCell>
-                  <TableCell>{order.amount.toLocaleString()}円</TableCell>
+                  <TableCell>
+                    {formatDateTime(order.createdAt, "HH:mm:ss")}
+                  </TableCell>
+                  <TableCell>
+                    {order.items.map((item, index) => (
+                      <div>
+                        {item.name} x {item.quantity}
+                      </div>
+                    ))}
+                  </TableCell>
+                  {/* <TableCell>{order.items}</TableCell> */}
+                  <TableCell>¥{order.totalAmount.toLocaleString()}</TableCell>
                   <TableCell>
                     <Button
                       onClick={() => handleEditOrder(order)}
@@ -407,7 +362,7 @@ const MonthlySummary: React.FC = () => {
           </DialogHeader>
           {editingOrder && (
             <div className="space-y-4">
-              <Input
+              {/* <Input
                 type="text"
                 value={editingOrder.customerName}
                 onChange={(e) =>
@@ -417,14 +372,14 @@ const MonthlySummary: React.FC = () => {
                   })
                 }
                 placeholder="顧客名"
-              />
+              /> */}
               <Input
                 type="number"
-                value={editingOrder.amount}
+                value={editingOrder.totalAmount}
                 onChange={(e) =>
                   setEditingOrder({
                     ...editingOrder,
-                    amount: Number(e.target.value),
+                    totalAmount: Number(e.target.value),
                   })
                 }
                 placeholder="金額"
