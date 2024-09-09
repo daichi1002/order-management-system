@@ -18,7 +18,6 @@ type OrderUsecase interface {
 	CancelOrder(ctx context.Context, id int) error
 }
 
-type DailyClosingUsecase interface {
-	CreateDailyClosings(ctx context.Context, input model.DailyClosing) error
-	IsSalesConfirmed(ctx context.Context, dateTime time.Time) (bool, error)
+type SalesUsecase interface {
+	GetMonthlySalesData(ctx context.Context, month string) (*generated.MonthlySalesData, error)
 }

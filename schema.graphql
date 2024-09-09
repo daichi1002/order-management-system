@@ -3,6 +3,7 @@ scalar DateTime
 type Query {
   getMenus: [Menu!]!
   getOrders(dateTime: DateTime!): [Order!]!
+  getMonthlySalesData(month: String!): MonthlySalesData!
 }
 
 type Mutation {
@@ -47,4 +48,19 @@ input MenuInput {
   id: ID!
   name: String!
   price: Float!
+}
+
+type DailySales {
+  date: String!
+  sales: Float!
+}
+
+type MonthlySummary {
+  totalSales: Float!
+  totalOrders: Int!
+}
+
+type MonthlySalesData {
+  monthlySummary: MonthlySummary!
+  dailySales: [DailySales!]!
 }

@@ -1,0 +1,12 @@
+query GetMonthlySalesData($month: String!) {
+  getMonthlySalesData(month: $month) {
+    monthlySummary {
+      totalSales
+      totalOrders
+    }
+    dailySales {
+      date
+      sales
+    }
+  }
+}

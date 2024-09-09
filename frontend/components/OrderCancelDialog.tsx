@@ -7,6 +7,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useState } from "react";
+import { Button } from "./ui/button";
 
 interface OrderCancelDialogProps {
   order: {
@@ -33,9 +34,7 @@ export function OrderCancelDialog({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <button className="bg-red-500 text-white px-2 py-1 rounded-md hover:bg-red-600">
-          キャンセル
-        </button>
+        <Button variant="destructive">キャンセル</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

@@ -91,6 +91,18 @@ func (r *queryResolver) GetOrders(ctx context.Context, dateTime scalar.DateTime)
 	return orders, nil
 }
 
+// GetMonthlySalesData is the resolver for the getMonthlySalesData field.
+func (r *queryResolver) GetMonthlySalesData(ctx context.Context, month string) (*generated.MonthlySalesData, error) {
+	sales, err := r.salesUsecase.GetMonthlySalesData(ctx, month)
+
+	if err != nil {
+		logger.Error("server error", zap.Error(err))
+		return nil, err
+	}
+
+	return sales, nil
+}
+
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 

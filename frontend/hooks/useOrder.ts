@@ -8,7 +8,9 @@ import {
   useCreateOrderMutation,
   useGetOrdersQuery,
 } from "@/lib/graphql/graphql";
+import { useTodaySalesStore } from "@/store/salesStore";
 import { useEffect, useState } from "react";
+import { useSales } from "./useSales";
 
 export const useOrder = () => {
   const [createOrder] = useCreateOrderMutation();
@@ -18,6 +20,9 @@ export const useOrder = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   // dateTimeの初期値を設定
   const [dateTime, setDateTime] = useState<string>(new Date().toISOString());
+  const { addSale, incrementOrderCount, decrementOrderCount, subtractSale } =
+    useTodaySalesStore();
+  const { refleshSales } = useSales(new Date().toISOString().slice(0, 7));
 
   // Helper function to initialize newOrder state
   function initializeNewOrder(): OrderInput {
@@ -95,6 +100,8 @@ export const useOrder = () => {
         await refreshOrders();
         setNewOrder(initializeNewOrder());
         setErrorMessage(null);
+        addSale(newOrder.totalAmount);
+        incrementOrderCount();
       } else {
         console.error("Unexpected response format:", result.data);
         throw new Error("注文の処理中にエラーが発生しました。");
@@ -109,6 +116,12 @@ export const useOrder = () => {
     try {
       const result = await deleteOrder({ variables: { id } });
       if (result.data?.cancelOrder) {
+        const cancelledOrder = orders.find((order) => order.id === id);
+        if (cancelledOrder) {
+          subtractSale(cancelledOrder.totalAmount);
+          decrementOrderCount();
+          await refleshSales();
+        }
         await refreshOrders();
       } else {
         throw new Error("注文のキャンセルに失敗しました");

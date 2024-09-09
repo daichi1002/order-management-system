@@ -6,6 +6,11 @@ import (
 	"github.com/daichi1002/order-management-system/backend/internal/adapter/graph/scalar"
 )
 
+type DailySales struct {
+	Date  string  `json:"date"`
+	Sales float64 `json:"sales"`
+}
+
 type Menu struct {
 	ID    string  `json:"id"`
 	Name  string  `json:"name"`
@@ -16,6 +21,16 @@ type MenuInput struct {
 	ID    string  `json:"id"`
 	Name  string  `json:"name"`
 	Price float64 `json:"price"`
+}
+
+type MonthlySalesData struct {
+	MonthlySummary *MonthlySummary `json:"monthlySummary"`
+	DailySales     []*DailySales   `json:"dailySales"`
+}
+
+type MonthlySummary struct {
+	TotalSales  float64 `json:"totalSales"`
+	TotalOrders int     `json:"totalOrders"`
 }
 
 type Mutation struct {

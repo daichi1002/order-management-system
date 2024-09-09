@@ -1,4 +1,7 @@
 "use client";
+import { ErrorMessage } from "@/components/layout/Error";
+import { LoadingSpinner } from "@/components/layout/Loading";
+import { OrderCancelDialog } from "@/components/OrderCancelDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -34,8 +37,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useOrder } from "@/hooks/useOrder";
+import { useSales } from "@/hooks/useSales";
 import { Order } from "@/lib/graphql/graphql";
 import { formatDateTime } from "@/lib/utils";
+import { useTodaySalesStore } from "@/store/salesStore";
 import {
   addMonths,
   eachDayOfInterval,
@@ -53,17 +58,21 @@ const maxVisiblePages = 5;
 const halfVisiblePages = Math.floor(maxVisiblePages / 2);
 
 const MonthlySummary: React.FC = () => {
-  const { orders, updateDateTime } = useOrder();
+  const { orders, cancelOrder, updateDateTime } = useOrder();
   const [selectedMonth, setSelectedMonth] = useState<string>(
     new Date().toISOString().slice(0, 7)
   );
   const [selectedDate, setSelectedDate] = useState<string>("");
-  const [dailySales, setDailySales] = useState<{ [key: string]: number }>({});
   const [editingOrder, setEditingOrder] = useState<Order | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
+  const { dailySales, monthlySummary, loading, error } =
+    useSales(selectedMonth);
+
+  const { sales: todaySales, orderCount: todayOrderCount } =
+    useTodaySalesStore();
   const orderListRef = useRef<HTMLDivElement>(null);
 
   // ページ初期化時に今日の日付を selectedDate にセット
@@ -72,13 +81,12 @@ const MonthlySummary: React.FC = () => {
     setSelectedDate(today);
   }, []);
 
+  if (loading) return <LoadingSpinner />;
+  if (error) return <ErrorMessage />;
+
   const handleEditOrder = (order: Order) => {
     setEditingOrder(order);
     setIsEditDialogOpen(true);
-  };
-
-  const handleDeleteOrder = (orderId: string) => {
-    // setOrders(orders.filter((order) => order.id !== orderId));
   };
 
   const handleSaveEdit = () => {
@@ -120,9 +128,8 @@ const MonthlySummary: React.FC = () => {
     });
 
     const weekDays = ["日", "月", "火", "水", "木", "金", "土"];
-
     const firstDayOfMonth = startOfMonth(monthStart);
-    const startDayIndex = firstDayOfMonth.getDay(); // 0: 日曜日, 1: 月曜日, ...
+    const startDayIndex = firstDayOfMonth.getDay();
 
     const calendarDays = Array.from({ length: startDayIndex }, (_, index) => (
       <div key={`empty-${index}`} className="empty-cell"></div>
@@ -139,6 +146,7 @@ const MonthlySummary: React.FC = () => {
         {days.map((day) => {
           const dateString = format(day, "yyyy-MM-dd");
           const dayOfMonth = format(day, "d");
+          // const sales = isToday(day) ? todaySales : dailySales[dateString] || 0;
           const sales = dailySales[dateString] || 0;
 
           return (
@@ -158,12 +166,6 @@ const MonthlySummary: React.FC = () => {
     );
   };
 
-  const totalMonthlySales = Object.values(dailySales).reduce(
-    (total, sales) => total + sales,
-    0
-  );
-
-  const totalOrderCount = orders.length;
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-8">
       <Card>
@@ -212,7 +214,7 @@ const MonthlySummary: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  ¥{totalMonthlySales.toLocaleString()}
+                  ¥{monthlySummary.totalSales.toLocaleString()}
                 </div>
               </CardContent>
             </Card>
@@ -221,7 +223,9 @@ const MonthlySummary: React.FC = () => {
                 <CardTitle className="text-sm font-medium">注文数</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{totalOrderCount}件</div>
+                <div className="text-2xl font-bold">
+                  {monthlySummary.totalOrders}件
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -267,12 +271,16 @@ const MonthlySummary: React.FC = () => {
                     >
                       編集
                     </Button>
-                    <Button
-                      onClick={() => handleDeleteOrder(order.id)}
-                      variant="destructive"
-                    >
-                      削除
-                    </Button>
+                    <OrderCancelDialog
+                      order={{
+                        id: order.id,
+                        ticketNumber: order.ticketNumber,
+                        totalAmount: order.totalAmount,
+                        items: order.items,
+                        createdAt: order.createdAt,
+                      }}
+                      onConfirm={cancelOrder}
+                    />
                   </TableCell>
                 </TableRow>
               ))}
