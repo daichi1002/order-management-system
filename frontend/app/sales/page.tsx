@@ -4,13 +4,6 @@ import { LoadingSpinner } from "@/components/layout/Loading";
 import { OrderCancelDialog } from "@/components/OrderCancelDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import {
   Pagination,
@@ -84,23 +77,6 @@ const MonthlySummary: React.FC = () => {
   if (loading) return <LoadingSpinner />;
   if (error) return <ErrorMessage />;
 
-  const handleEditOrder = (order: Order) => {
-    setEditingOrder(order);
-    setIsEditDialogOpen(true);
-  };
-
-  const handleSaveEdit = () => {
-    if (editingOrder) {
-      // setOrders(
-      //   orders.map((order) =>
-      //     order.id === editingOrder.id ? editingOrder : order
-      //   )
-      // );
-      setIsEditDialogOpen(false);
-      setEditingOrder(null);
-    }
-  };
-
   const totalPages = Math.ceil(orders.length / itemsPerPage);
   const paginatedOrders = orders.slice(
     (currentPage - 1) * itemsPerPage,
@@ -146,7 +122,6 @@ const MonthlySummary: React.FC = () => {
         {days.map((day) => {
           const dateString = format(day, "yyyy-MM-dd");
           const dayOfMonth = format(day, "d");
-          // const sales = isToday(day) ? todaySales : dailySales[dateString] || 0;
           const sales = dailySales[dateString] || 0;
 
           return (
@@ -262,15 +237,8 @@ const MonthlySummary: React.FC = () => {
                       </div>
                     ))}
                   </TableCell>
-                  {/* <TableCell>{order.items}</TableCell> */}
                   <TableCell>¥{order.totalAmount.toLocaleString()}</TableCell>
                   <TableCell>
-                    <Button
-                      onClick={() => handleEditOrder(order)}
-                      className="mr-2"
-                    >
-                      編集
-                    </Button>
                     <OrderCancelDialog
                       order={{
                         id: order.id,
@@ -362,43 +330,6 @@ const MonthlySummary: React.FC = () => {
           </div>
         </CardContent>
       </Card>
-
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>注文編集</DialogTitle>
-          </DialogHeader>
-          {editingOrder && (
-            <div className="space-y-4">
-              {/* <Input
-                type="text"
-                value={editingOrder.customerName}
-                onChange={(e) =>
-                  setEditingOrder({
-                    ...editingOrder,
-                    customerName: e.target.value,
-                  })
-                }
-                placeholder="顧客名"
-              /> */}
-              <Input
-                type="number"
-                value={editingOrder.totalAmount}
-                onChange={(e) =>
-                  setEditingOrder({
-                    ...editingOrder,
-                    totalAmount: Number(e.target.value),
-                  })
-                }
-                placeholder="金額"
-              />
-            </div>
-          )}
-          <DialogFooter>
-            <Button onClick={handleSaveEdit}>保存</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
