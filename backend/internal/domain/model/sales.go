@@ -8,7 +8,7 @@ import (
 
 type Sales struct {
 	Id          int            `gorm:"primaryKey" json:"id"`
-	Date        time.Time      `gorm:"type:date" json:"date"`
+	Date        string         `gorm:"type:date" json:"date"`
 	TotalSales  float64        `json:"totalSales"`
 	TotalOrders int            `json:"totalOrders"`
 	CreatedAt   *time.Time     `json:"-"`

@@ -18,6 +18,11 @@ type Order struct {
 	Items        []OrderItem    `gorm:"foreignKey:OrderId" json:"items"`
 }
 
+type AggregatedOrder struct {
+	TotalSales  float64
+	TotalOrders int
+}
+
 func NewOrder(ticketNumber int, orderDate time.Time, totalAmount float64) (*Order, error) {
 	o := &Order{
 		TicketNumber: ticketNumber,

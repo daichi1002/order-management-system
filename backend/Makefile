@@ -12,3 +12,6 @@ migrate-down:
 
 generate:
 	go run github.com/99designs/gqlgen generate
+
+batch:
+	go run ./cmd/batch/main.go

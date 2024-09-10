@@ -29,3 +29,21 @@ func (r *salesRepository) GetMonthlySales(ctx context.Context, month string) ([]
 
 	return sales, nil
 }
+
+func (r *salesRepository) CreateSales(tx *gorm.DB, data model.Sales) error {
+	result := tx.Omit("DeletedAt").Create(&data)
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
+func (r *salesRepository) GetSalesByDate(tx *gorm.DB, date string) (*model.Sales, error) {
+	var sales *model.Sales
+	if err := r.db.Where(&model.Sales{Date: date}).First(&sales).Error; err != nil {
+		return nil, err
+	}
+	return sales, nil
+}

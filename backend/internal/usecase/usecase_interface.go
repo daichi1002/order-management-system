@@ -20,4 +20,5 @@ type OrderUsecase interface {
 
 type SalesUsecase interface {
 	GetMonthlySalesData(ctx context.Context, month string) (*generated.MonthlySalesData, error)
+	CreateSales(date time.Time) error
 }

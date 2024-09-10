@@ -2,9 +2,12 @@ package usecase
 
 import (
 	"context"
+	"errors"
+	"time"
 
 	"github.com/daichi1002/order-management-system/backend/internal/adapter/graph/generated"
 	"github.com/daichi1002/order-management-system/backend/internal/adapter/repository"
+	"github.com/daichi1002/order-management-system/backend/internal/domain/model"
 	"github.com/daichi1002/order-management-system/backend/internal/infrastructure/database"
 	"github.com/daichi1002/order-management-system/backend/internal/util"
 )
@@ -33,8 +36,12 @@ func (u *salesUsecase) GetMonthlySalesData(ctx context.Context, month string) (*
 	for _, sales := range salesList {
 		totalSales += sales.TotalSales
 		totalOrders += sales.TotalOrders
+		parsedTime, err := time.Parse(time.RFC3339, sales.Date)
+		if err != nil {
+			return nil, err
+		}
 		dailySales = append(dailySales, &generated.DailySales{
-			Date:  sales.Date.Format("2006-01-02"),
+			Date:  parsedTime.Format("2006-01-02"),
 			Sales: sales.TotalSales,
 		})
 	}
@@ -68,4 +75,40 @@ func (u *salesUsecase) GetMonthlySalesData(ctx context.Context, month string) (*
 		},
 		DailySales: dailySales,
 	}, nil
+}
+
+func (u *salesUsecase) CreateSales(date time.Time) error {
+	tx := u.txManager.Begin()
+	defer u.txManager.Rollback(tx)
+	dateStr := date.Format("2006-01-02")
+	// 同じ日付のデータがないことをチェック
+	salesData, err := u.salesRepository.GetSalesByDate(tx, dateStr)
+	if err != nil {
+		return err
+	}
+
+	if salesData != nil {
+		return errors.New("同じ日付のデータがすでに存在しています。")
+	}
+
+	// 指定日のOrderデータの集計
+	summaryOrders, err := u.orderRepository.GetAggregatedOrder(tx, date)
+	if err != nil {
+		return err
+	}
+
+	sales := model.Sales{
+		Date:        dateStr,
+		TotalSales:  summaryOrders.TotalSales,
+		TotalOrders: summaryOrders.TotalOrders,
+	}
+	// salesテーブルへ登録
+	err = u.salesRepository.CreateSales(tx, sales)
+	if err != nil {
+		return err
+	}
+
+	u.txManager.Commit(tx)
+
+	return nil
 }
