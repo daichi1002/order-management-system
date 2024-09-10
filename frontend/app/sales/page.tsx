@@ -29,9 +29,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { toast } from "@/components/ui/use-toast";
 import { useOrder } from "@/hooks/useOrder";
 import { useSales } from "@/hooks/useSales";
 import { Order } from "@/lib/graphql/graphql";
+import { withErrorHandling } from "@/lib/toast-utils";
 import { formatDateTime } from "@/lib/utils";
 import { useTodaySalesStore } from "@/store/salesStore";
 import {
@@ -56,8 +58,6 @@ const MonthlySummary: React.FC = () => {
     new Date().toISOString().slice(0, 7)
   );
   const [selectedDate, setSelectedDate] = useState<string>("");
-  const [editingOrder, setEditingOrder] = useState<Order | null>(null);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
@@ -140,6 +140,13 @@ const MonthlySummary: React.FC = () => {
       </div>
     );
   };
+
+  const handleCancelOrder = withErrorHandling(
+    (id: string) => cancelOrder(id),
+    "注文が正常にキャンセルされました。",
+    "注文のキャンセルに失敗しました。もう一度お試しください。",
+    toast
+  );
 
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-8">
@@ -247,7 +254,7 @@ const MonthlySummary: React.FC = () => {
                         items: order.items,
                         createdAt: order.createdAt,
                       }}
-                      onConfirm={cancelOrder}
+                      onConfirm={handleCancelOrder}
                     />
                   </TableCell>
                 </TableRow>
