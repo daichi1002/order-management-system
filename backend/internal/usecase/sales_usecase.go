@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/daichi1002/order-management-system/backend/internal/adapter/graph/generated"
@@ -77,12 +78,12 @@ func (u *salesUsecase) GetMonthlySalesData(ctx context.Context, month string) (*
 	}, nil
 }
 
-func (u *salesUsecase) CreateSales(date time.Time) error {
+func (u *salesUsecase) CreateSales(ctx context.Context, date time.Time) error {
 	tx := u.txManager.Begin()
 	defer u.txManager.Rollback(tx)
 	dateStr := date.Format("2006-01-02")
 	// 同じ日付のデータがないことをチェック
-	salesData, err := u.salesRepository.GetSalesByDate(tx, dateStr)
+	salesData, err := u.salesRepository.GetSalesByDate(ctx, dateStr)
 	if err != nil {
 		return err
 	}
@@ -91,16 +92,25 @@ func (u *salesUsecase) CreateSales(date time.Time) error {
 		return errors.New("同じ日付のデータがすでに存在しています。")
 	}
 
-	// 指定日のOrderデータの集計
-	summaryOrders, err := u.orderRepository.GetAggregatedOrder(tx, date)
+	// 指定日のOrderデータの取得
+	orders, err := u.orderRepository.GetOrdersWithDetails(ctx, date)
 	if err != nil {
 		return err
 	}
 
+	var totalSales float64
+	var totalOrders int
+
+	for _, order := range orders {
+		fmt.Println(order.Id)
+		totalSales += order.TotalAmount
+		totalOrders++
+	}
+
 	sales := model.Sales{
 		Date:        dateStr,
-		TotalSales:  summaryOrders.TotalSales,
-		TotalOrders: summaryOrders.TotalOrders,
+		TotalSales:  totalSales,
+		TotalOrders: totalOrders,
 	}
 	// salesテーブルへ登録
 	err = u.salesRepository.CreateSales(tx, sales)

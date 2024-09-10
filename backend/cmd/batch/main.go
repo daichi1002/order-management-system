@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"log"
 	"os"
@@ -23,6 +24,7 @@ func main() {
 		logger.Fatal("Error loading .env file", zap.Error(err))
 	}
 
+	ctx := context.Background()
 	targetDate := flag.String("date", "", "Target date for aggregation (format: YYYY-MM-DD)")
 	flag.Parse()
 
@@ -48,7 +50,7 @@ func main() {
 	salesRepository := repository.NewSalesRepository(db)
 
 	salesUsecase := usecase.NewSalesUsecase(txManager, salesRepository, orderRepository)
-	err = salesUsecase.CreateSales(aggregationDate)
+	err = salesUsecase.CreateSales(ctx, aggregationDate)
 
 	if err != nil {
 		log.Fatal("Failed batch", zap.Error(err))

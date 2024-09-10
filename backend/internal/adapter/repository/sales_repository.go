@@ -40,10 +40,17 @@ func (r *salesRepository) CreateSales(tx *gorm.DB, data model.Sales) error {
 	return nil
 }
 
-func (r *salesRepository) GetSalesByDate(tx *gorm.DB, date string) (*model.Sales, error) {
+func (r *salesRepository) GetSalesByDate(ctx context.Context, date string) (*model.Sales, error) {
 	var sales *model.Sales
-	if err := r.db.Where(&model.Sales{Date: date}).First(&sales).Error; err != nil {
-		return nil, err
+	result := r.db.Where(&model.Sales{Date: date}).Find(&sales)
+
+	if result.Error != nil {
+		return nil, result.Error
 	}
+
+	if result.RowsAffected == 0 {
+		return nil, nil
+	}
+
 	return sales, nil
 }
