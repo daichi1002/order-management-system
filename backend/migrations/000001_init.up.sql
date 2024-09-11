@@ -14,7 +14,6 @@ CREATE TABLE menus (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     price DECIMAL(10, 2) NOT NULL,
-    available BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMP with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP with time zone DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP with time zone DEFAULT NULL

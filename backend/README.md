@@ -63,12 +63,12 @@ make migrate-down
 
 ```
 -- `menus` テーブルにテストデータを挿入
-INSERT INTO "menus" ("name", "price", "available", "created_at", "updated_at")
+INSERT INTO "menus" ("name", "price", "created_at", "updated_at")
 VALUES
-    ('親子丼', 800.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ('アジフライ定食', 750.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ('長崎皿うどん', 850.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ('ハンバーグ定食', 850.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+    ('親子丼', 800.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('アジフライ定食', 750.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('長崎皿うどん', 850.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('ハンバーグ定食', 850.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- `orders` テーブルにテストデータを挿入
 INSERT INTO "orders" ("ticket_number", "order_date", "total_amount", "created_at", "updated_at")

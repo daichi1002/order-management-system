@@ -2,7 +2,6 @@ package model
 
 import (
 	"errors"
-	"strconv"
 	"time"
 
 	"gorm.io/gorm"
@@ -20,17 +19,12 @@ type OrderItem struct {
 	Menu      Menu           `gorm:"foreignKey:MenuId" json:"menu"`
 }
 
-func NewOrderItem(menuId string, quantity int, price float64) (*OrderItem, error) {
-	id, err := strconv.Atoi(menuId)
-
-	if err != nil {
-		return nil, err
-	}
-
+func NewOrderItem(menu Menu, quantity int, price float64) (*OrderItem, error) {
 	o := &OrderItem{
-		MenuId:   id,
+		MenuId:   menu.Id,
 		Quantity: quantity,
 		Price:    price,
+		Menu:     menu,
 	}
 
 	if err := o.validate(); err != nil {

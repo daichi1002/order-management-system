@@ -25,7 +25,18 @@ func (r *mutationResolver) CreateOrder(ctx context.Context, input generated.Orde
 
 	var orderItems []*model.OrderItem
 	for _, o := range input.Items {
-		item, err := model.NewOrderItem(o.Menu.ID, o.Quantity, o.Price)
+		menuId, err := strconv.Atoi(o.Menu.ID)
+
+		if err != nil {
+			return "", err
+		}
+
+		menu, err := model.NewMenu(menuId, o.Menu.Name, o.Menu.Price)
+		if err != nil {
+			return "", err
+		}
+
+		item, err := model.NewOrderItem(*menu, o.Quantity, o.Price)
 		if err != nil {
 			return "", err
 		}

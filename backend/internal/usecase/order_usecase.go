@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -34,6 +35,7 @@ func (u *orderUsecase) CreateOrder(ctx context.Context, order *model.Order, orde
 	}
 
 	for _, item := range orderItems {
+		fmt.Println(item)
 		item.OrderId = id
 	}
 
@@ -42,9 +44,24 @@ func (u *orderUsecase) CreateOrder(ctx context.Context, order *model.Order, orde
 		return 0, err
 	}
 
+	u.printReceipt(order, orderItems)
+
 	u.txManager.Commit(tx)
 
 	return id, nil
+}
+
+func (u *orderUsecase) printReceipt(order *model.Order, orderItems []*model.OrderItem) {
+	fmt.Println("注文伝票")
+	fmt.Println("--------------------------------")
+	fmt.Println("番号札: ", order.TicketNumber)
+	fmt.Println("メニュー:")
+	for _, item := range orderItems {
+		fmt.Printf("%-20s ¥%.0f\n", item.Menu.Name, item.Price)
+	}
+
+	fmt.Println("--------------------------------")
+	fmt.Printf("合計金額: ¥%.0f\n", order.TotalAmount)
 }
 
 func (u *orderUsecase) GetOrders(ctx context.Context, dateTime time.Time) ([]*generated.Order, error) {
