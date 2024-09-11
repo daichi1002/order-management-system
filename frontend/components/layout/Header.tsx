@@ -1,4 +1,3 @@
-import { MenuIcon } from "lucide-react";
 import Link from "next/link";
 import { Button } from "../ui/button";
 import {
@@ -19,7 +18,7 @@ const Header = () => {
           className="flex items-center gap-2 text-lg font-semibold"
           prefetch={false}
         >
-          <MenuIcon className="w-6 h-6" />
+          {/* <MenuIcon className="w-6 h-6" /> */}
           <span>ひなたぼっこ</span>
         </Link>
         {/* <Link href="/" className="text-primary-foreground" prefetch={false}>
@@ -35,11 +34,7 @@ const Header = () => {
         >
           注文履歴
         </Link>
-        <Link
-          href="/sales"
-          className="text-muted-foreground"
-          prefetch={false}
-        >
+        <Link href="/sales" className="text-muted-foreground" prefetch={false}>
           売上管理
         </Link>
       </nav>

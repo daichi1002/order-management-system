@@ -32,10 +32,8 @@ import {
 import { toast } from "@/components/ui/use-toast";
 import { useOrder } from "@/hooks/useOrder";
 import { useSales } from "@/hooks/useSales";
-import { Order } from "@/lib/graphql/graphql";
 import { withErrorHandling } from "@/lib/toast-utils";
 import { formatDateTime } from "@/lib/utils";
-import { useTodaySalesStore } from "@/store/salesStore";
 import {
   addMonths,
   eachDayOfInterval,
@@ -64,8 +62,6 @@ const MonthlySummary: React.FC = () => {
   const { dailySales, monthlySummary, loading, error } =
     useSales(selectedMonth);
 
-  const { sales: todaySales, orderCount: todayOrderCount } =
-    useTodaySalesStore();
   const orderListRef = useRef<HTMLDivElement>(null);
 
   // ページ初期化時に今日の日付を selectedDate にセット
@@ -152,7 +148,7 @@ const MonthlySummary: React.FC = () => {
     <div className="p-8 max-w-7xl mx-auto space-y-8">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-2xl font-bold">月間売上サマリー</CardTitle>
+          <CardTitle className="text-2xl font-bold">月間売上</CardTitle>
           <div className="flex items-center space-x-2">
             <Button
               variant="outline"
