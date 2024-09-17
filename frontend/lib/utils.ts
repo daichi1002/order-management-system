@@ -2,10 +2,13 @@ import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
-export const formatDateTime = (dateString: string, format: string = "YYYY/MM/DD HH:mm:ss"): string => {
+export const formatDateTime = (
+  dateString: string,
+  format: string = "YYYY/MM/DD HH:mm:ss"
+): string => {
   const date = new Date(dateString);
 
   // JSTに変換
@@ -15,11 +18,11 @@ export const formatDateTime = (dateString: string, format: string = "YYYY/MM/DD 
 
   // フォーマット用の各部分
   const year = jstTime.getUTCFullYear();
-  const month = String(jstTime.getUTCMonth() + 1).padStart(2, '0');
-  const day = String(jstTime.getUTCDate()).padStart(2, '0');
-  const hours = String(jstTime.getUTCHours()).padStart(2, '0');
-  const minutes = String(jstTime.getUTCMinutes()).padStart(2, '0');
-  const seconds = String(jstTime.getUTCSeconds()).padStart(2, '0');
+  const month = String(jstTime.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(jstTime.getUTCDate()).padStart(2, "0");
+  const hours = String(jstTime.getUTCHours()).padStart(2, "0");
+  const minutes = String(jstTime.getUTCMinutes()).padStart(2, "0");
+  const seconds = String(jstTime.getUTCSeconds()).padStart(2, "0");
 
   // フォーマットに応じて日時を作成
   return format
@@ -34,5 +37,7 @@ export const formatDateTime = (dateString: string, format: string = "YYYY/MM/DD 
 // 今日の日付を取得するユーティリティ関数
 export const getTodayDate = () => {
   const today = new Date();
-  return `${today.getFullYear()}/${today.getMonth() + 1}/${today.getDate()}`;
+  return `${today.getFullYear()}年${
+    today.getMonth() + 1
+  }月${today.getDate()}日`;
 };

@@ -66,7 +66,7 @@ const MonthlySummary: React.FC = () => {
 
   // ページ初期化時に今日の日付を selectedDate にセット
   useEffect(() => {
-    const today = format(new Date(), "yyyy-MM-dd");
+    const today = format(new Date(), "yyyy年MM月dd日");
     setSelectedDate(today);
   }, []);
 
