@@ -16,7 +16,7 @@ func MarshalDateTime(t DateTime) graphql.Marshaler {
 		// JSTタイムゾーンを設定
 		loc, _ := time.LoadLocation("Asia/Tokyo")
 		jstTime := time.Time(t).In(loc)
-		io.WriteString(w, fmt.Sprintf("%q", jstTime.Format(time.RFC3339)))
+		_, _ = io.WriteString(w, fmt.Sprintf("%q", jstTime.Format(time.RFC3339)))
 	})
 }
 
