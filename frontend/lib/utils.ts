@@ -1,4 +1,5 @@
 import { type ClassValue, clsx } from "clsx";
+import { format } from "date-fns";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -41,3 +42,8 @@ export const getTodayDate = () => {
     today.getMonth() + 1
   }月${today.getDate()}日`;
 };
+
+export const getInitialSelectedMonth = (): string =>
+  new Date().toISOString().slice(0, 7);
+export const getInitialSelectedDate = (): string =>
+  format(new Date(), "yyyy年MM月dd日");

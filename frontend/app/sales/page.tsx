@@ -1,10 +1,24 @@
 "use client";
+import { toast } from "@/components/ui/use-toast";
+import { withErrorHandling } from "@/lib/toast-utils";
+import { getInitialSelectedDate, getInitialSelectedMonth } from "@/lib/utils";
+import {
+  eachDayOfInterval,
+  endOfMonth,
+  format,
+  parse,
+  startOfMonth,
+} from "date-fns";
+import React, { useEffect, useRef, useState } from "react";
+
+// コンポーネントのインポート
 import { ErrorMessage } from "@/components/layout/Error";
 import { LoadingSpinner } from "@/components/layout/Loading";
-import { OrderCancelDialog } from "@/components/OrderCancelDialog";
-import { Button } from "@/components/ui/button";
+import { CalendarDay } from "@/components/sales/CalendarDay";
+import { MonthSelector } from "@/components/sales/MonthSelector";
+import { OrderTable } from "@/components/sales/OrderTable";
+import { SummaryCard } from "@/components/sales/SummaryCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import {
   Pagination,
   PaginationContent,
@@ -21,53 +35,35 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { toast } from "@/components/ui/use-toast";
+
+// カスタムフックのインポート
 import { useOrder } from "@/hooks/useOrder";
 import { useSales } from "@/hooks/useSales";
-import { withErrorHandling } from "@/lib/toast-utils";
-import { formatDateTime } from "@/lib/utils";
-import {
-  addMonths,
-  eachDayOfInterval,
-  endOfMonth,
-  format,
-  isToday,
-  parse,
-  startOfMonth,
-  subMonths,
-} from "date-fns";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import React, { useEffect, useRef, useState } from "react";
 
-const maxVisiblePages = 5;
-const halfVisiblePages = Math.floor(maxVisiblePages / 2);
+// 定数
+const MAX_VISIBLE_PAGES = 5;
+const HALF_VISIBLE_PAGES = Math.floor(MAX_VISIBLE_PAGES / 2);
+const WEEK_DAYS = ["日", "月", "火", "水", "木", "金", "土"];
 
+// メインコンポーネント
 const MonthlySummary: React.FC = () => {
-  const { orders, cancelOrder, updateDateTime } = useOrder();
   const [selectedMonth, setSelectedMonth] = useState<string>(
-    new Date().toISOString().slice(0, 7)
+    getInitialSelectedMonth()
   );
-  const [selectedDate, setSelectedDate] = useState<string>("");
+  const [selectedDate, setSelectedDate] = useState<string>(
+    getInitialSelectedDate()
+  );
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
+  const { orders, cancelOrder, updateDateTime } = useOrder();
   const { dailySales, monthlySummary, loading, error } =
     useSales(selectedMonth);
 
   const orderListRef = useRef<HTMLDivElement>(null);
 
-  // ページ初期化時に今日の日付を selectedDate にセット
   useEffect(() => {
-    const today = format(new Date(), "yyyy年MM月dd日");
-    setSelectedDate(today);
+    setSelectedDate(getInitialSelectedDate());
   }, []);
 
   if (loading) return <LoadingSpinner />;
@@ -80,9 +76,7 @@ const MonthlySummary: React.FC = () => {
   );
 
   const scrollToOrderList = () => {
-    if (orderListRef.current) {
-      orderListRef.current.scrollIntoView({ behavior: "smooth" });
-    }
+    orderListRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   const handleDateClick = (dateString: string) => {
@@ -92,6 +86,13 @@ const MonthlySummary: React.FC = () => {
     scrollToOrderList();
   };
 
+  const handleCancelOrder = withErrorHandling(
+    (id: string) => cancelOrder(id),
+    "注文が正常にキャンセルされました。",
+    "注文のキャンセルに失敗しました。もう一度お試しください。",
+    toast
+  );
+
   const renderCalendar = () => {
     const monthStart = parse(selectedMonth, "yyyy-MM", new Date());
     const days = eachDayOfInterval({
@@ -99,7 +100,6 @@ const MonthlySummary: React.FC = () => {
       end: endOfMonth(monthStart),
     });
 
-    const weekDays = ["日", "月", "火", "水", "木", "金", "土"];
     const firstDayOfMonth = startOfMonth(monthStart);
     const startDayIndex = firstDayOfMonth.getDay();
 
@@ -109,103 +109,47 @@ const MonthlySummary: React.FC = () => {
 
     return (
       <div className="grid grid-cols-7 gap-4">
-        {weekDays.map((day) => (
+        {WEEK_DAYS.map((day) => (
           <div key={day} className="font-bold text-center">
             {day}
           </div>
         ))}
         {calendarDays}
-        {days.map((day) => {
-          const dateString = format(day, "yyyy-MM-dd");
-          const dayOfMonth = format(day, "d");
-          const sales = dailySales[dateString] || 0;
-
-          return (
-            <div
-              key={dateString}
-              className={`p-4 border rounded-lg text-center cursor-pointer ${
-                isToday(day) ? "bg-blue-100" : "hover:bg-gray-100"
-              }`}
-              onClick={() => handleDateClick(dateString)}
-            >
-              <div>{dayOfMonth}</div>
-              <div className="text-red-400">¥{sales.toLocaleString()}</div>
-            </div>
-          );
-        })}
+        {days.map((day) => (
+          <CalendarDay
+            key={format(day, "yyyy-MM-dd")}
+            day={day}
+            sales={dailySales[format(day, "yyyy-MM-dd")] || 0}
+            onDateClick={handleDateClick}
+            isSelected={selectedDate === format(day, "yyyy-MM-dd")}
+          />
+        ))}
       </div>
     );
   };
-
-  const handleCancelOrder = withErrorHandling(
-    (id: string) => cancelOrder(id),
-    "注文が正常にキャンセルされました。",
-    "注文のキャンセルに失敗しました。もう一度お試しください。",
-    toast
-  );
 
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-8">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-2xl font-bold">月間売上</CardTitle>
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => {
-                const newMonth = format(
-                  subMonths(parse(selectedMonth, "yyyy-MM", new Date()), 1),
-                  "yyyy-MM"
-                );
-                setSelectedMonth(newMonth);
-              }}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Input
-              type="month"
-              value={selectedMonth}
-              onChange={(e) => setSelectedMonth(e.target.value)}
-              className="w-40"
-            />
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => {
-                const newMonth = format(
-                  addMonths(parse(selectedMonth, "yyyy-MM", new Date()), 1),
-                  "yyyy-MM"
-                );
-                setSelectedMonth(newMonth);
-              }}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
+          <MonthSelector
+            selectedMonth={selectedMonth}
+            onMonthChange={(newDate: Date) =>
+              setSelectedMonth(format(newDate, "yyyy-MM"))
+            }
+          />
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">総売上</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  ¥{monthlySummary.totalSales.toLocaleString()}
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">注文数</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {monthlySummary.totalOrders}件
-                </div>
-              </CardContent>
-            </Card>
+            <SummaryCard
+              title="総売上"
+              value={`¥${monthlySummary.totalSales.toLocaleString()}`}
+            />
+            <SummaryCard
+              title="注文数"
+              value={`${monthlySummary.totalOrders}件`}
+            />
           </div>
           {renderCalendar()}
         </CardContent>
@@ -218,45 +162,10 @@ const MonthlySummary: React.FC = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>時間</TableHead>
-                <TableHead>メニュー</TableHead>
-                <TableHead>金額</TableHead>
-                <TableHead>操作</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {paginatedOrders.map((order) => (
-                <TableRow key={order.id}>
-                  <TableCell>
-                    {formatDateTime(order.createdAt, "HH:mm:ss")}
-                  </TableCell>
-                  <TableCell>
-                    {order.items.map((item, index) => (
-                      <div key={index}>
-                        {item.name} x {item.quantity}
-                      </div>
-                    ))}
-                  </TableCell>
-                  <TableCell>¥{order.totalAmount.toLocaleString()}</TableCell>
-                  <TableCell>
-                    <OrderCancelDialog
-                      order={{
-                        id: order.id,
-                        ticketNumber: order.ticketNumber,
-                        totalAmount: order.totalAmount,
-                        items: order.items,
-                        createdAt: order.createdAt,
-                      }}
-                      onConfirm={handleCancelOrder}
-                    />
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <OrderTable
+            orders={paginatedOrders}
+            onCancelOrder={handleCancelOrder}
+          />
           <div className="mt-4 flex justify-between items-center">
             <Pagination>
               <PaginationContent>
@@ -273,8 +182,8 @@ const MonthlySummary: React.FC = () => {
                   if (
                     index === 0 ||
                     index === totalPages - 1 ||
-                    (index >= currentPage - halfVisiblePages &&
-                      index <= currentPage + halfVisiblePages)
+                    (index >= currentPage - HALF_VISIBLE_PAGES &&
+                      index <= currentPage + HALF_VISIBLE_PAGES)
                   ) {
                     return (
                       <PaginationItem key={index}>
@@ -291,9 +200,9 @@ const MonthlySummary: React.FC = () => {
                       </PaginationItem>
                     );
                   } else if (
-                    (index === currentPage - halfVisiblePages - 1 &&
+                    (index === currentPage - HALF_VISIBLE_PAGES - 1 &&
                       index > 0) ||
-                    (index === currentPage + halfVisiblePages + 1 &&
+                    (index === currentPage + HALF_VISIBLE_PAGES + 1 &&
                       index < totalPages - 1)
                   ) {
                     return (
@@ -302,7 +211,6 @@ const MonthlySummary: React.FC = () => {
                       </PaginationItem>
                     );
                   }
-
                   return null;
                 })}
                 <PaginationItem>

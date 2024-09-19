@@ -1,8 +1,8 @@
 "use client";
 import { ErrorMessage } from "@/components/layout/Error";
 import { LoadingSpinner } from "@/components/layout/Loading";
-import { MenuList } from "@/components/MenuList";
-import { OrderForm } from "@/components/OrderForm";
+import { MenuList } from "@/components/orders/MenuList";
+import { OrderForm } from "@/components/orders/OrderForm";
 import { useToast } from "@/components/ui/use-toast";
 import { useMenu } from "@/hooks/useMenu";
 import { useOrder } from "@/hooks/useOrder";

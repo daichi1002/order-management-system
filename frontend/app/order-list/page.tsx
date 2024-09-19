@@ -1,8 +1,8 @@
 "use client";
 import { ErrorMessage } from "@/components/layout/Error";
 import { LoadingSpinner } from "@/components/layout/Loading";
+import { OrderCancelDialog } from "@/components/layout/OrderCancelDialog";
 import { Pagination } from "@/components/layout/Pagenation";
-import { OrderCancelDialog } from "@/components/OrderCancelDialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
