@@ -57,6 +57,7 @@ export type Mutation = {
 
 
 export type MutationCancelOrderArgs = {
+  dateTime: Scalars['DateTime']['input'];
   id: Scalars['ID']['input'];
 };
 
@@ -125,6 +126,7 @@ export type CreateOrderMutation = { __typename?: 'Mutation', createOrder: string
 
 export type CancelOrderMutationVariables = Exact<{
   id: Scalars['ID']['input'];
+  dateTime: Scalars['DateTime']['input'];
 }>;
 
 
@@ -218,8 +220,8 @@ export type CreateOrderMutationHookResult = ReturnType<typeof useCreateOrderMuta
 export type CreateOrderMutationResult = Apollo.MutationResult<CreateOrderMutation>;
 export type CreateOrderMutationOptions = Apollo.BaseMutationOptions<CreateOrderMutation, CreateOrderMutationVariables>;
 export const CancelOrderDocument = gql`
-    mutation CancelOrder($id: ID!) {
-  cancelOrder(id: $id)
+    mutation CancelOrder($id: ID!, $dateTime: DateTime!) {
+  cancelOrder(id: $id, dateTime: $dateTime)
 }
     `;
 export type CancelOrderMutationFn = Apollo.MutationFunction<CancelOrderMutation, CancelOrderMutationVariables>;
@@ -238,6 +240,7 @@ export type CancelOrderMutationFn = Apollo.MutationFunction<CancelOrderMutation,
  * const [cancelOrderMutation, { data, loading, error }] = useCancelOrderMutation({
  *   variables: {
  *      id: // value for 'id'
+ *      dateTime: // value for 'dateTime'
  *   },
  * });
  */

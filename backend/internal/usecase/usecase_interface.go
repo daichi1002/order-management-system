@@ -15,7 +15,7 @@ type MenuUsecase interface {
 type OrderUsecase interface {
 	CreateOrder(ctx context.Context, order *model.Order, orderItems []*model.OrderItem) (int, error)
 	GetOrders(ctx context.Context, dateTime time.Time) ([]*generated.Order, error)
-	CancelOrder(ctx context.Context, id int) error
+	CancelOrder(ctx context.Context, id int, dateTime time.Time) error
 }
 
 type SalesUsecase interface {

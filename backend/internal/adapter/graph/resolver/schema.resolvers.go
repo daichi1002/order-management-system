@@ -53,14 +53,14 @@ func (r *mutationResolver) CreateOrder(ctx context.Context, input generated.Orde
 }
 
 // CancelOrder is the resolver for the cancelOrder field.
-func (r *mutationResolver) CancelOrder(ctx context.Context, id string) (bool, error) {
+func (r *mutationResolver) CancelOrder(ctx context.Context, id string, dateTime scalar.DateTime) (bool, error) {
 	orderId, err := strconv.Atoi(id)
 
 	if err != nil {
 		return false, err
 	}
 
-	err = r.orderUsecase.CancelOrder(ctx, orderId)
+	err = r.orderUsecase.CancelOrder(ctx, orderId, time.Time(dateTime))
 
 	if err != nil {
 		logger.Error("server error", zap.Error(err))

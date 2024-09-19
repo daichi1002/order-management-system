@@ -17,10 +17,11 @@ type orderUsecase struct {
 	txManager           database.TxManager
 	orderRepository     repository.OrderRepository
 	orderItemRepository repository.OrderItemRepository
+	salesRepository     repository.SalesRepository
 }
 
-func NewOrderUsecase(txManager database.TxManager, orderRepository repository.OrderRepository, orderItemRepository repository.OrderItemRepository) OrderUsecase {
-	return &orderUsecase{txManager, orderRepository, orderItemRepository}
+func NewOrderUsecase(txManager database.TxManager, orderRepository repository.OrderRepository, orderItemRepository repository.OrderItemRepository, salesRepository repository.SalesRepository) OrderUsecase {
+	return &orderUsecase{txManager, orderRepository, orderItemRepository, salesRepository}
 }
 
 func (u *orderUsecase) CreateOrder(ctx context.Context, order *model.Order, orderItems []*model.OrderItem) (int, error) {
@@ -35,7 +36,6 @@ func (u *orderUsecase) CreateOrder(ctx context.Context, order *model.Order, orde
 	}
 
 	for _, item := range orderItems {
-		fmt.Println(item)
 		item.OrderId = id
 	}
 
@@ -100,7 +100,7 @@ func (u *orderUsecase) convertToResponseOrderItems(dbItems []model.OrderItem) []
 	return items
 }
 
-func (u *orderUsecase) CancelOrder(ctx context.Context, id int) error {
+func (u *orderUsecase) CancelOrder(ctx context.Context, id int, dateTime time.Time) error {
 
 	tx := u.txManager.Begin()
 
@@ -112,9 +112,30 @@ func (u *orderUsecase) CancelOrder(ctx context.Context, id int) error {
 		return err
 	}
 
-	err = u.orderRepository.DeleteOrder(ctx, tx, id)
+	deleteOrder, err := u.orderRepository.DeleteOrder(ctx, tx, id)
 	if err != nil {
 		return err
+	}
+
+	// // salesデータが存在すれば、合計売上と合計注文数の増減を行う
+	dateStr := dateTime.Format("2006-01-02")
+	salesData, err := u.salesRepository.GetSalesByDate(ctx, dateStr)
+	if err != nil {
+		return err
+	}
+
+	if salesData != nil {
+		updatedData := model.Sales{
+			Id:          salesData.Id,
+			Date:        salesData.Date,
+			TotalSales:  salesData.TotalSales - deleteOrder.TotalAmount,
+			TotalOrders: salesData.TotalOrders - 1,
+			CreatedAt:   salesData.CreatedAt,
+		}
+		err = u.salesRepository.UpdateSales(tx, updatedData)
+		if err != nil {
+			return err
+		}
 	}
 
 	u.txManager.Commit(tx)

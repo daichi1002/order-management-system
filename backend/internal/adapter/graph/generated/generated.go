@@ -68,7 +68,7 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CancelOrder func(childComplexity int, id string) int
+		CancelOrder func(childComplexity int, id string, dateTime scalar.DateTime) int
 		CreateOrder func(childComplexity int, input OrderInput) int
 	}
 
@@ -95,7 +95,7 @@ type ComplexityRoot struct {
 
 type MutationResolver interface {
 	CreateOrder(ctx context.Context, input OrderInput) (string, error)
-	CancelOrder(ctx context.Context, id string) (bool, error)
+	CancelOrder(ctx context.Context, id string, dateTime scalar.DateTime) (bool, error)
 }
 type QueryResolver interface {
 	GetMenus(ctx context.Context) ([]*Menu, error)
@@ -195,7 +195,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CancelOrder(childComplexity, args["id"].(string)), true
+		return e.complexity.Mutation.CancelOrder(childComplexity, args["id"].(string), args["dateTime"].(scalar.DateTime)), true
 
 	case "Mutation.createOrder":
 		if e.complexity.Mutation.CreateOrder == nil {
@@ -414,7 +414,7 @@ type Query {
 
 type Mutation {
   createOrder(input: OrderInput!): ID!
-  cancelOrder(id: ID!): Boolean!
+  cancelOrder(id: ID!, dateTime: DateTime!): Boolean!
 }
 
 type Menu {
@@ -469,7 +469,8 @@ type MonthlySummary {
 type MonthlySalesData {
   monthlySummary: MonthlySummary!
   dailySales: [DailySales!]!
-}`, BuiltIn: false},
+}
+`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
@@ -489,6 +490,15 @@ func (ec *executionContext) field_Mutation_cancelOrder_args(ctx context.Context,
 		}
 	}
 	args["id"] = arg0
+	var arg1 scalar.DateTime
+	if tmp, ok := rawArgs["dateTime"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dateTime"))
+		arg1, err = ec.unmarshalNDateTime2githubᚗcomᚋdaichi1002ᚋorderᚑmanagementᚑsystemᚋbackendᚋinternalᚋadapterᚋgraphᚋscalarᚐDateTime(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["dateTime"] = arg1
 	return args, nil
 }
 
@@ -1067,7 +1077,7 @@ func (ec *executionContext) _Mutation_cancelOrder(ctx context.Context, field gra
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CancelOrder(rctx, fc.Args["id"].(string))
+		return ec.resolvers.Mutation().CancelOrder(rctx, fc.Args["id"].(string), fc.Args["dateTime"].(scalar.DateTime))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

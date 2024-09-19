@@ -7,7 +7,6 @@ import { useToast } from "@/components/ui/use-toast";
 import { useMenu } from "@/hooks/useMenu";
 import { useOrder } from "@/hooks/useOrder";
 import { withErrorHandling } from "@/lib/toast-utils";
-import { useMemo } from "react";
 
 export default function OrderPage() {
   const { menu, loading: menuLoading, error: menuError } = useMenu();
@@ -22,8 +21,6 @@ export default function OrderPage() {
     getOrderError,
   } = useOrder();
   const { toast } = useToast();
-
-  const today = useMemo(() => new Date().toISOString(), []);
 
   if (menuLoading || getOrderLoading) return <LoadingSpinner />;
   if (menuError || getOrderError) return <ErrorMessage />;

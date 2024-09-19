@@ -17,7 +17,7 @@ interface OrderCancelDialogProps {
     items: { name: string; quantity: number }[];
     createdAt: string;
   };
-  onConfirm: (orderId: string) => void;
+  onConfirm: (orderId: string, date: string) => void;
 }
 
 export function OrderCancelDialog({
@@ -27,7 +27,7 @@ export function OrderCancelDialog({
   const [isOpen, setIsOpen] = useState(false);
 
   const handleConfirm = () => {
-    onConfirm(order.id);
+    onConfirm(order.id, new Date().toISOString());
     setIsOpen(false);
   };
 

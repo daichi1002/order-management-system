@@ -15,7 +15,7 @@ type MenuRepository interface {
 type OrderRepository interface {
 	CreateOrder(ctx context.Context, tx *gorm.DB, order *model.Order) (int, error)
 	GetOrdersWithDetails(ctx context.Context, dateTime time.Time) ([]*model.Order, error)
-	DeleteOrder(ctx context.Context, tx *gorm.DB, id int) error
+	DeleteOrder(ctx context.Context, tx *gorm.DB, id int) (*model.Order, error)
 }
 
 type OrderItemRepository interface {
@@ -27,4 +27,5 @@ type SalesRepository interface {
 	GetMonthlySales(ctx context.Context, month string) ([]model.Sales, error)
 	CreateSales(tx *gorm.DB, data model.Sales) error
 	GetSalesByDate(ctx context.Context, date string) (*model.Sales, error)
+	UpdateSales(x *gorm.DB, updatedData model.Sales) error
 }

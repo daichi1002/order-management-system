@@ -6,6 +6,7 @@ import (
 
 	"github.com/daichi1002/order-management-system/backend/internal/domain/model"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type orderRepository struct {
@@ -43,12 +44,13 @@ func (r *orderRepository) GetOrdersWithDetails(ctx context.Context, dateTime tim
 	return orders, nil
 }
 
-func (r *orderRepository) DeleteOrder(ctx context.Context, tx *gorm.DB, id int) error {
-	result := tx.WithContext(ctx).Where("id = ?", id).Delete(&model.Order{})
+func (r *orderRepository) DeleteOrder(ctx context.Context, tx *gorm.DB, id int) (*model.Order, error) {
+	var order model.Order
+	result := tx.WithContext(ctx).Model(&order).Where("id = ?", id).Clauses(clause.Returning{}).Delete(&order)
 
 	if result.Error != nil {
-		return result.Error
+		return nil, result.Error
 	}
 
-	return nil
+	return &order, nil
 }

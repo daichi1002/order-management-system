@@ -3,7 +3,6 @@ package usecase
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/daichi1002/order-management-system/backend/internal/adapter/graph/generated"
@@ -102,7 +101,6 @@ func (u *salesUsecase) CreateSales(ctx context.Context, date time.Time) error {
 	var totalOrders int
 
 	for _, order := range orders {
-		fmt.Println(order.Id)
 		totalSales += order.TotalAmount
 		totalOrders++
 	}

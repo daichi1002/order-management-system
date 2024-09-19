@@ -22,7 +22,7 @@ export default function OrderListPage() {
   const { orders, getOrderLoading, getOrderError, cancelOrder } = useOrder();
   const { toast } = useToast();
   const handleCancelOrder = withErrorHandling(
-    (id: string) => cancelOrder(id),
+    (id: string, date: string) => cancelOrder(id),
     "注文が正常にキャンセルされました。",
     "注文のキャンセルに失敗しました。もう一度お試しください。",
     toast

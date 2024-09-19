@@ -114,7 +114,7 @@ export const useOrder = () => {
 
   const cancelOrder = async (id: string) => {
     try {
-      const result = await deleteOrder({ variables: { id } });
+      const result = await deleteOrder({ variables: { id, dateTime } });
       if (result.data?.cancelOrder) {
         const cancelledOrder = orders.find((order) => order.id === id);
         if (cancelledOrder) {

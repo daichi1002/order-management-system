@@ -54,3 +54,13 @@ func (r *salesRepository) GetSalesByDate(ctx context.Context, date string) (*mod
 
 	return sales, nil
 }
+
+func (r *salesRepository) UpdateSales(tx *gorm.DB, updatedData model.Sales) error {
+	result := tx.Save(&updatedData)
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}

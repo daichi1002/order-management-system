@@ -8,7 +8,7 @@ type Query {
 
 type Mutation {
   createOrder(input: OrderInput!): ID!
-  cancelOrder(id: ID!): Boolean!
+  cancelOrder(id: ID!, dateTime: DateTime!): Boolean!
 }
 
 type Menu {
