@@ -77,9 +77,6 @@ export const useOrder = () => {
   };
 
   const placeOrder = async () => {
-    if (!newOrder.ticketNumber) {
-      throw new Error("番号札を入力してください。");
-    }
     if (newOrder.items.length === 0) {
       throw new Error("注文を追加してください。");
     }
