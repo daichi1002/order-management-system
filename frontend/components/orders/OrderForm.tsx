@@ -5,7 +5,6 @@ interface OrderFormProps {
   newOrder: {
     items: OrderItemInput[];
     totalAmount: number;
-    ticketNumber: number;
   };
   removeFromOrder: (index: number) => void;
   placeOrder: () => Promise<void>;
