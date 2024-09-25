@@ -29,7 +29,6 @@ export const useOrder = () => {
     return {
       items: [],
       totalAmount: 0,
-      ticketNumber: 0,
       createdAt: new Date().toLocaleString(),
     };
   }
@@ -87,7 +86,6 @@ export const useOrder = () => {
           input: {
             createdAt: new Date().toISOString(),
             items: newOrder.items,
-            ticketNumber: newOrder.ticketNumber,
             totalAmount: newOrder.totalAmount,
           },
         },
@@ -129,17 +127,6 @@ export const useOrder = () => {
     }
   };
 
-  const handleTicketNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const ticketNumber = parseInt(e.target.value, 10);
-    if (!isNaN(ticketNumber)) {
-      setNewOrder((prevOrder) => ({ ...prevOrder, ticketNumber }));
-      setErrorMessage(null);
-    } else {
-      setNewOrder((prevOrder) => ({ ...prevOrder, ticketNumber: 0 }));
-      setErrorMessage("有効な番号を入力してください。");
-    }
-  };
-
   const {
     data: getOrdersData,
     loading: getOrderLoading,
@@ -166,7 +153,6 @@ export const useOrder = () => {
     removeFromOrder,
     placeOrder,
     cancelOrder,
-    handleTicketNumberChange,
     getOrderLoading,
     getOrderError,
     updateDateTime,

@@ -6,6 +6,7 @@ import (
 
 	"github.com/daichi1002/order-management-system/backend/internal/adapter/graph/generated"
 	"github.com/daichi1002/order-management-system/backend/internal/domain/model"
+	"gorm.io/gorm"
 )
 
 type MenuUsecase interface {
@@ -21,4 +22,8 @@ type OrderUsecase interface {
 type SalesUsecase interface {
 	GetMonthlySalesData(ctx context.Context, month string) (*generated.MonthlySalesData, error)
 	CreateSales(ctx context.Context, date time.Time) error
+}
+
+type CounterUsecase interface {
+	GetNextNumber(tx *gorm.DB) (int, error)
 }

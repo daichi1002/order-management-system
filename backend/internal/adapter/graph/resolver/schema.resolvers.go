@@ -18,7 +18,7 @@ import (
 
 // CreateOrder is the resolver for the createOrder field.
 func (r *mutationResolver) CreateOrder(ctx context.Context, input generated.OrderInput) (string, error) {
-	order, err := model.NewOrder(input.TicketNumber, time.Time(input.CreatedAt), input.TotalAmount)
+	order, err := model.NewOrder(time.Time(input.CreatedAt), input.TotalAmount)
 	if err != nil {
 		return "", err
 	}

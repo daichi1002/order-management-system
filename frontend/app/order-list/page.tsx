@@ -61,7 +61,6 @@ export default function OrderListPage() {
               <TableRow>
                 <TableHead>注文ID</TableHead>
                 <TableHead>注文内容</TableHead>
-                <TableHead>番号札</TableHead>
                 <TableHead>合計</TableHead>
                 <TableHead>注文時間</TableHead>
                 <TableHead>操作</TableHead>
@@ -80,7 +79,6 @@ export default function OrderListPage() {
                       ))}
                     </ul>
                   </TableCell>
-                  <TableCell>{order.ticketNumber}</TableCell>
                   <TableCell>¥{order.totalAmount}</TableCell>
                   <TableCell>
                     {formatDateTime(order.createdAt, "HH:mm:ss")}
@@ -89,7 +87,6 @@ export default function OrderListPage() {
                     <OrderCancelDialog
                       order={{
                         id: order.id,
-                        ticketNumber: order.ticketNumber,
                         totalAmount: order.totalAmount,
                         items: order.items,
                         createdAt: order.createdAt,

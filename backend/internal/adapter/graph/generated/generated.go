@@ -73,11 +73,10 @@ type ComplexityRoot struct {
 	}
 
 	Order struct {
-		CreatedAt    func(childComplexity int) int
-		ID           func(childComplexity int) int
-		Items        func(childComplexity int) int
-		TicketNumber func(childComplexity int) int
-		TotalAmount  func(childComplexity int) int
+		CreatedAt   func(childComplexity int) int
+		ID          func(childComplexity int) int
+		Items       func(childComplexity int) int
+		TotalAmount func(childComplexity int) int
 	}
 
 	OrderItem struct {
@@ -229,13 +228,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Order.Items(childComplexity), true
-
-	case "Order.ticketNumber":
-		if e.complexity.Order.TicketNumber == nil {
-			break
-		}
-
-		return e.complexity.Order.TicketNumber(childComplexity), true
 
 	case "Order.totalAmount":
 		if e.complexity.Order.TotalAmount == nil {
@@ -427,7 +419,6 @@ type Order {
   id: ID!
   items: [OrderItem!]!
   totalAmount: Float!
-  ticketNumber: Int!
   createdAt: DateTime!
 }
 
@@ -440,7 +431,6 @@ type OrderItem {
 input OrderInput {
   items: [OrderItemInput!]!
   totalAmount: Float!
-  ticketNumber: Int!
   createdAt: DateTime!
 }
 
@@ -1258,50 +1248,6 @@ func (ec *executionContext) fieldContext_Order_totalAmount(_ context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _Order_ticketNumber(ctx context.Context, field graphql.CollectedField, obj *Order) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Order_ticketNumber(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.TicketNumber, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Order_ticketNumber(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Order",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Order_createdAt(ctx context.Context, field graphql.CollectedField, obj *Order) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Order_createdAt(ctx, field)
 	if err != nil {
@@ -1575,8 +1521,6 @@ func (ec *executionContext) fieldContext_Query_getOrders(ctx context.Context, fi
 				return ec.fieldContext_Order_items(ctx, field)
 			case "totalAmount":
 				return ec.fieldContext_Order_totalAmount(ctx, field)
-			case "ticketNumber":
-				return ec.fieldContext_Order_ticketNumber(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Order_createdAt(ctx, field)
 			}
@@ -3608,7 +3552,7 @@ func (ec *executionContext) unmarshalInputOrderInput(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"items", "totalAmount", "ticketNumber", "createdAt"}
+	fieldsInOrder := [...]string{"items", "totalAmount", "createdAt"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -3629,13 +3573,6 @@ func (ec *executionContext) unmarshalInputOrderInput(ctx context.Context, obj in
 				return it, err
 			}
 			it.TotalAmount = data
-		case "ticketNumber":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ticketNumber"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.TicketNumber = data
 		case "createdAt":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
 			data, err := ec.unmarshalNDateTime2githubᚗcomᚋdaichi1002ᚋorderᚑmanagementᚑsystemᚋbackendᚋinternalᚋadapterᚋgraphᚋscalarᚐDateTime(ctx, v)
@@ -3958,11 +3895,6 @@ func (ec *executionContext) _Order(ctx context.Context, sel ast.SelectionSet, ob
 			}
 		case "totalAmount":
 			out.Values[i] = ec._Order_totalAmount(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "ticketNumber":
-			out.Values[i] = ec._Order_ticketNumber(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

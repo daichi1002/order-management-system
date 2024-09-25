@@ -18,13 +18,9 @@ const Header = () => {
           className="flex items-center gap-2 text-lg font-semibold"
           prefetch={false}
         >
-          {/* <MenuIcon className="w-6 h-6" /> */}
           <span>ひなたぼっこ</span>
         </Link>
-        {/* <Link href="/" className="text-primary-foreground" prefetch={false}>
-          ダッシュボード
-        </Link> */}
-        <Link href="/orders" className="text-muted-foreground" prefetch={false}>
+        <Link href="/" className="text-muted-foreground" prefetch={false}>
           注文
         </Link>
         <Link

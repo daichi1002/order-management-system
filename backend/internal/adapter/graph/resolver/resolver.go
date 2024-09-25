@@ -24,9 +24,11 @@ func NewResolver(db *gorm.DB) *Resolver {
 	orderRepository := repository.NewOrderRepository(db)
 	orderItemRepository := repository.NewOrderItemRepository(db)
 	salesRepository := repository.NewSalesRepository(db)
+	counterRepository := repository.NewCounterRepository(db)
 
+	counterUsecase := usecase.NewCounterUsecase(counterRepository)
 	menuUsecase := usecase.NewMenuUsecase(menuRepository)
-	orderUsecase := usecase.NewOrderUsecase(txManager, orderRepository, orderItemRepository, salesRepository)
+	orderUsecase := usecase.NewOrderUsecase(txManager, orderRepository, orderItemRepository, salesRepository, counterUsecase)
 	salesUsecase := usecase.NewSalesUsecase(txManager, salesRepository, orderRepository)
 
 	return &Resolver{
