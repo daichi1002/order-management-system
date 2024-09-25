@@ -71,14 +71,12 @@ export type Order = {
   createdAt: Scalars['DateTime']['output'];
   id: Scalars['ID']['output'];
   items: Array<OrderItem>;
-  ticketNumber: Scalars['Int']['output'];
   totalAmount: Scalars['Float']['output'];
 };
 
 export type OrderInput = {
   createdAt: Scalars['DateTime']['input'];
   items: Array<OrderItemInput>;
-  ticketNumber: Scalars['Int']['input'];
   totalAmount: Scalars['Float']['input'];
 };
 
@@ -137,7 +135,7 @@ export type GetOrdersQueryVariables = Exact<{
 }>;
 
 
-export type GetOrdersQuery = { __typename?: 'Query', getOrders: Array<{ __typename?: 'Order', id: string, totalAmount: number, ticketNumber: number, createdAt: any, items: Array<{ __typename?: 'OrderItem', name: string, quantity: number, price: number }> }> };
+export type GetOrdersQuery = { __typename?: 'Query', getOrders: Array<{ __typename?: 'Order', id: string, totalAmount: number, createdAt: any, items: Array<{ __typename?: 'OrderItem', name: string, quantity: number, price: number }> }> };
 
 export type GetMonthlySalesDataQueryVariables = Exact<{
   month: Scalars['String']['input'];
@@ -261,7 +259,6 @@ export const GetOrdersDocument = gql`
       price
     }
     totalAmount
-    ticketNumber
     createdAt
   }
 }

@@ -27,5 +27,11 @@ type SalesRepository interface {
 	GetMonthlySales(ctx context.Context, month string) ([]model.Sales, error)
 	CreateSales(tx *gorm.DB, data model.Sales) error
 	GetSalesByDate(ctx context.Context, date string) (*model.Sales, error)
-	UpdateSales(x *gorm.DB, updatedData model.Sales) error
+	UpdateSales(tx *gorm.DB, updatedData model.Sales) error
+}
+
+type CounterRepository interface {
+	GetNextNumber(date string) (*model.Counter, error)
+	UpdateNumber(tx *gorm.DB, data *model.Counter) error
+	CreateNumber(tx *gorm.DB, data *model.Counter) error
 }

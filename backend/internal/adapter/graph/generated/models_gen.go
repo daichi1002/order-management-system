@@ -37,18 +37,16 @@ type Mutation struct {
 }
 
 type Order struct {
-	ID           string          `json:"id"`
-	Items        []*OrderItem    `json:"items"`
-	TotalAmount  float64         `json:"totalAmount"`
-	TicketNumber int             `json:"ticketNumber"`
-	CreatedAt    scalar.DateTime `json:"createdAt"`
+	ID          string          `json:"id"`
+	Items       []*OrderItem    `json:"items"`
+	TotalAmount float64         `json:"totalAmount"`
+	CreatedAt   scalar.DateTime `json:"createdAt"`
 }
 
 type OrderInput struct {
-	Items        []*OrderItemInput `json:"items"`
-	TotalAmount  float64           `json:"totalAmount"`
-	TicketNumber int               `json:"ticketNumber"`
-	CreatedAt    scalar.DateTime   `json:"createdAt"`
+	Items       []*OrderItemInput `json:"items"`
+	TotalAmount float64           `json:"totalAmount"`
+	CreatedAt   scalar.DateTime   `json:"createdAt"`
 }
 
 type OrderItem struct {

@@ -12,7 +12,6 @@ import { Button } from "../ui/button";
 interface OrderCancelDialogProps {
   order: {
     id: string;
-    ticketNumber: number;
     totalAmount: number;
     items: { name: string; quantity: number }[];
     createdAt: string;
@@ -57,9 +56,6 @@ export function OrderCancelDialog({
               </li>
             ))}
           </ul>
-          <p>
-            <strong>番号札:</strong> {order.ticketNumber}
-          </p>
           <p>
             <strong>合計金額:</strong> ¥{order.totalAmount}
           </p>

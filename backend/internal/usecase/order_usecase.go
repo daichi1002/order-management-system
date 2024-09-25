@@ -18,10 +18,17 @@ type orderUsecase struct {
 	orderRepository     repository.OrderRepository
 	orderItemRepository repository.OrderItemRepository
 	salesRepository     repository.SalesRepository
+	counterUsecase      CounterUsecase
 }
 
-func NewOrderUsecase(txManager database.TxManager, orderRepository repository.OrderRepository, orderItemRepository repository.OrderItemRepository, salesRepository repository.SalesRepository) OrderUsecase {
-	return &orderUsecase{txManager, orderRepository, orderItemRepository, salesRepository}
+func NewOrderUsecase(
+	txManager database.TxManager,
+	orderRepository repository.OrderRepository,
+	orderItemRepository repository.OrderItemRepository,
+	salesRepository repository.SalesRepository,
+	counterUsecase CounterUsecase,
+) OrderUsecase {
+	return &orderUsecase{txManager, orderRepository, orderItemRepository, salesRepository, counterUsecase}
 }
 
 func (u *orderUsecase) CreateOrder(ctx context.Context, order *model.Order, orderItems []*model.OrderItem) (int, error) {
@@ -44,17 +51,22 @@ func (u *orderUsecase) CreateOrder(ctx context.Context, order *model.Order, orde
 		return 0, err
 	}
 
-	u.printReceipt(order, orderItems)
+	ticketNumber, err := u.counterUsecase.GetNextNumber(tx)
+	if err != nil {
+		return 0, err
+	}
+
+	u.printReceipt(order, orderItems, ticketNumber)
 
 	u.txManager.Commit(tx)
 
 	return id, nil
 }
 
-func (u *orderUsecase) printReceipt(order *model.Order, orderItems []*model.OrderItem) {
+func (u *orderUsecase) printReceipt(order *model.Order, orderItems []*model.OrderItem, ticketNumber int) {
 	fmt.Println("注文伝票")
 	fmt.Println("--------------------------------")
-	fmt.Println("番号札: ", order.TicketNumber)
+	fmt.Println("番号札: ", ticketNumber)
 	fmt.Println("メニュー:")
 	for _, item := range orderItems {
 		fmt.Printf("%-20s ¥%.0f\n", item.Menu.Name, item.Price)
@@ -77,11 +89,10 @@ func (u *orderUsecase) convertToResponseOrders(dbOrders []*model.Order) []*gener
 	var orders []*generated.Order
 	for _, dbOrder := range dbOrders {
 		orders = append(orders, &generated.Order{
-			ID:           strconv.Itoa(dbOrder.Id),
-			TicketNumber: dbOrder.TicketNumber,
-			TotalAmount:  dbOrder.TotalAmount,
-			CreatedAt:    scalar.TimeToDateTime(dbOrder.OrderDate),
-			Items:        u.convertToResponseOrderItems(dbOrder.Items),
+			ID:          strconv.Itoa(dbOrder.Id),
+			TotalAmount: dbOrder.TotalAmount,
+			CreatedAt:   scalar.TimeToDateTime(dbOrder.OrderDate),
+			Items:       u.convertToResponseOrderItems(dbOrder.Items),
 		})
 	}
 

@@ -21,7 +21,6 @@ type Order {
   id: ID!
   items: [OrderItem!]!
   totalAmount: Float!
-  ticketNumber: Int!
   createdAt: DateTime!
 }
 
@@ -34,7 +33,6 @@ type OrderItem {
 input OrderInput {
   items: [OrderItemInput!]!
   totalAmount: Float!
-  ticketNumber: Int!
   createdAt: DateTime!
 }
 

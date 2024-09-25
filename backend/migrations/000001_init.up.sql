@@ -2,7 +2,6 @@ SELECT CURRENT_TIMESTAMP AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Tokyo';
 
 CREATE TABLE orders (
     id SERIAL PRIMARY KEY,
-    ticket_number INT NOT NULL,
     order_date TIMESTAMP with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
     total_amount DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
     created_at TIMESTAMP with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -37,6 +36,15 @@ CREATE TABLE sales (
     date DATE NOT NULL,
     total_sales DECIMAL(15, 2) NOT NULL DEFAULT 0.00,
     total_orders INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMP with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP with time zone DEFAULT CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMP with time zone DEFAULT NULL
+);
+
+CREATE TABLE counters (
+    id SERIAL PRIMARY KEY,
+    date DATE NOT NULL UNIQUE,
+    number INT NOT NULL,
     created_at TIMESTAMP with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP with time zone DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP with time zone DEFAULT NULL
