@@ -18,6 +18,3 @@ report:
 diff:
   datastores:
     - artifact://${GITHUB_REPOSITORY}
-permissions:
-  pull-requests: write
-  contents: write
