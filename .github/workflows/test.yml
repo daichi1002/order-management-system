@@ -24,7 +24,7 @@ jobs:
         with:
           go-version: "1.23"
       - name: Run tests with coverage output
-        run: go test -cover -coverprofile-coverage.out `go list ./... | grep -v "**.gen.go" | grep -v "mock_**.go" | grep -v "generated.go"`
+        run: go test -cover -coverprofile=coverage.out `go list ./... | grep -v "**.gen.go" | grep -v "mock_**.go" | grep -v "generated.go"`
       - name: Coverage report comment
         if: always()
         uses: k1LoW/octocov-action@v0
