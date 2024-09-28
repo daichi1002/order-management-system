@@ -10,7 +10,7 @@ import { withErrorHandling } from "@/lib/toast-utils";
 
 export default function OrderPage() {
   const { menu, loading: menuLoading, error: menuError } = useMenu();
-  const { newOrder, addToOrder, removeFromOrder, placeOrder } = useOrder();
+  const { newOrder, addToOrder, removeFromOrder, updateItemQuantity, placeOrder } = useOrder();
   const { toast } = useToast();
 
   if (menuLoading) return <LoadingSpinner />;
@@ -32,6 +32,7 @@ export default function OrderPage() {
         <OrderForm
           newOrder={newOrder}
           removeFromOrder={removeFromOrder}
+          updateItemQuantity={updateItemQuantity}
           placeOrder={handlePlaceOrder}
         />
       </div>

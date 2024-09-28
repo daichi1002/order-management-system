@@ -44,24 +44,44 @@ export const useOrder = () => {
     }));
   };
 
-  const addToOrder = (item: Menu) => {
-    const existingItem = newOrder.items.find(
-      (orderItem) => orderItem.menu.id === item.id
+  const updateItemQuantity = (index: number, newQuantity: number) => {
+    if (newQuantity < 1) return;
+
+    const updatedItems = newOrder.items.map((item, i) =>
+      i === index ? { ...item, quantity: newQuantity } : item
     );
-    const updatedItems = existingItem
-      ? newOrder.items.map((orderItem) =>
-          orderItem.menu.id === item.id
-            ? { ...orderItem, quantity: orderItem.quantity + 1 }
-            : orderItem
-        )
-      : [...newOrder.items, { menu: item, quantity: 1, price: item.price }];
 
     const updatedTotalAmount = updatedItems.reduce(
-      (total, orderItem) => total + orderItem.price * orderItem.quantity,
+      (total, item) => total + item.price * item.quantity,
       0
     );
 
     updateOrderItems(updatedItems, updatedTotalAmount);
+    setErrorMessage(null);
+  };
+
+  const addToOrder = (item: Menu) => {
+    const existingItemIndex = newOrder.items.findIndex(
+      (orderItem) => orderItem.menu.id === item.id
+    );
+
+    if (existingItemIndex !== -1) {
+      updateItemQuantity(
+        existingItemIndex,
+        newOrder.items[existingItemIndex].quantity + 1
+      );
+    } else {
+      const updatedItems = [
+        ...newOrder.items,
+        { menu: item, quantity: 1, price: item.price },
+      ];
+      const updatedTotalAmount = updatedItems.reduce(
+        (total, orderItem) => total + orderItem.price * orderItem.quantity,
+        0
+      );
+      updateOrderItems(updatedItems, updatedTotalAmount);
+    }
+
     setErrorMessage(null);
   };
 
@@ -151,6 +171,7 @@ export const useOrder = () => {
     errorMessage,
     addToOrder,
     removeFromOrder,
+    updateItemQuantity,
     placeOrder,
     cancelOrder,
     getOrderLoading,
