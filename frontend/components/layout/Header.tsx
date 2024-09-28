@@ -1,13 +1,4 @@
 import Link from "next/link";
-import { Button } from "../ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
 
 const Header = () => {
   return (
@@ -34,7 +25,7 @@ const Header = () => {
           売上管理
         </Link>
       </nav>
-      <div className="ml-auto flex items-center gap-4">
+      {/* <div className="ml-auto flex items-center gap-4">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="rounded-full">
@@ -57,7 +48,7 @@ const Header = () => {
             <DropdownMenuItem>ログアウト</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      </div>
+      </div> */}
     </header>
   );
 };
