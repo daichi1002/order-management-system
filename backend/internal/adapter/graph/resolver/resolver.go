@@ -19,6 +19,7 @@ type Resolver struct {
 
 func NewResolver(db *gorm.DB) *Resolver {
 	txManager := database.NewTxManager(db)
+	// printer := printer.NewPrinter()
 
 	menuRepository := repository.NewMenuRepository(db)
 	orderRepository := repository.NewOrderRepository(db)

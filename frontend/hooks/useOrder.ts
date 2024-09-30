@@ -95,7 +95,7 @@ export const useOrder = () => {
     setErrorMessage(null);
   };
 
-  const placeOrder = async () => {
+  const placeOrder = async (): Promise<OrderInput | null> => {
     if (newOrder.items.length === 0) {
       throw new Error("注文を追加してください。");
     }
@@ -111,12 +111,13 @@ export const useOrder = () => {
         },
       });
 
-      if (result.data) {
+      if (result.data?.createOrder) {
         await refreshOrders();
         setNewOrder(initializeNewOrder());
         setErrorMessage(null);
         addSale(newOrder.totalAmount);
         incrementOrderCount();
+        return newOrder;
       } else {
         console.error("Unexpected response format:", result.data);
         throw new Error("注文の処理中にエラーが発生しました。");
@@ -126,7 +127,6 @@ export const useOrder = () => {
       throw new Error("注文の送信に失敗しました。");
     }
   };
-
   const cancelOrder = async (id: string) => {
     try {
       const result = await deleteOrder({ variables: { id, dateTime } });
