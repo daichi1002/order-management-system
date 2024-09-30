@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"fmt"
 	"strconv"
 	"time"
 
@@ -51,29 +50,14 @@ func (u *orderUsecase) CreateOrder(ctx context.Context, order *model.Order, orde
 		return 0, err
 	}
 
-	ticketNumber, err := u.counterUsecase.GetNextNumber(tx)
-	if err != nil {
-		return 0, err
-	}
+	// ticketNumber, err := u.counterUsecase.GetNextNumber(tx)
+	// if err != nil {
+	// 	return 0, err
+	// }
 
-	// レシート内容の作成
-	receiptData := u.createReceipt(order, orderItems, ticketNumber)
-	fmt.Println(receiptData)
 	u.txManager.Commit(tx)
 
 	return id, nil
-}
-
-func (u *orderUsecase) createReceipt(order *model.Order, orderItems []*model.OrderItem, ticketNumber int) string {
-	receipt := "注文伝票\n--------------------------------\n"
-	receipt += fmt.Sprintf("番号札: %d\n", ticketNumber)
-	receipt += "メニュー:\n"
-	for _, item := range orderItems {
-		receipt += fmt.Sprintf("%-20s ¥%.0f\n", item.Menu.Name, item.Price)
-	}
-	receipt += "--------------------------------\n"
-	receipt += fmt.Sprintf("合計金額: ¥%.0f\n", order.TotalAmount)
-	return receipt
 }
 
 func (u *orderUsecase) GetOrders(ctx context.Context, dateTime time.Time) ([]*generated.Order, error) {
