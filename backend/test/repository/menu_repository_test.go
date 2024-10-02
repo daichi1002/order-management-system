@@ -8,25 +8,13 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/daichi1002/order-management-system/backend/internal/adapter/repository"
 	"github.com/daichi1002/order-management-system/backend/internal/domain/model"
+	"github.com/daichi1002/order-management-system/backend/test"
 	"github.com/stretchr/testify/assert"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 )
 
 func TestGetMenus(t *testing.T) {
-	sqlDB, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-	}
-	defer sqlDB.Close()
-
-	dialector := postgres.New(postgres.Config{
-		Conn: sqlDB,
-	})
-	db, err := gorm.Open(dialector, &gorm.Config{})
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a gorm database", err)
-	}
+	db, mock, closeDB := test.SetupTestDB(t)
+	defer closeDB()
 
 	testCases := []struct {
 		name          string
