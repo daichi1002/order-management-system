@@ -15,3 +15,8 @@ generate:
 
 batch:
 	go run ./cmd/batch/main.go
+
+mock:
+	mockgen -source=./internal/infrastructure/database/transaction.go \
+	-destination=./internal/infrastructure/database/mock/mock_transaction.go \
+	-package=mock_database
