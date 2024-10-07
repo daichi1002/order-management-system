@@ -133,3 +133,67 @@ func TestUpdateNumber(t *testing.T) {
 		})
 	}
 }
+
+func TestCreateNumber(t *testing.T) {
+	db, mock, closeDB := test.SetupTestDB(t)
+	defer closeDB()
+
+	testCases := []struct {
+		name        string
+		counter     *model.Counter
+		expectError bool
+		mockSetup   func(sqlmock.Sqlmock)
+	}{
+		{
+			name: "成功：データが作成できる",
+			counter: &model.Counter{
+				Date:   "2023-10-04",
+				Number: 11,
+			},
+			expectError: false,
+			mockSetup: func(mock sqlmock.Sqlmock) {
+				mock.ExpectBegin()
+				mock.ExpectQuery(regexp.QuoteMeta(`INSERT INTO "counters" ("date","number") VALUES ($1,$2) RETURNING "id"`)).
+					WithArgs("2023-10-04", 11).
+					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
+				mock.ExpectCommit()
+			},
+		},
+		{
+			name: "失敗：データベースエラー",
+			counter: &model.Counter{
+				Date:   "2023-10-04",
+				Number: 11,
+			},
+			expectError: true,
+			mockSetup: func(mock sqlmock.Sqlmock) {
+				mock.ExpectBegin()
+				mock.ExpectQuery(regexp.QuoteMeta(`INSERT INTO "counters" ("date","number") VALUES ($1,$2) RETURNING "id"`)).
+					WithArgs("2023-10-04", 11).
+					WillReturnError(errors.New("database error"))
+				mock.ExpectRollback()
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.mockSetup(mock)
+
+			repo := repository.NewCounterRepository(db)
+
+			err := db.Transaction(func(tx *gorm.DB) error {
+				return repo.CreateNumber(tx, tc.counter)
+			})
+
+			if tc.expectError {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+
+			err = mock.ExpectationsWereMet()
+			assert.NoError(t, err)
+		})
+	}
+}
